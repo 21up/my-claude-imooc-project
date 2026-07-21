@@ -1,0 +1,261 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#002113",
+                    "on-background": "#0b1c30",
+                    "surface-dark": "#0F172A",
+                    "background-light": "#F8FAFC",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#0f52ba",
+                    "on-primary-fixed": "#001945",
+                    "tertiary": "#870011",
+                    "inverse-primary": "#b0c6ff",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-primary-fixed-variant": "#00419c",
+                    "outline": "#737784",
+                    "on-surface-variant": "#434653",
+                    "surface-dim": "#cbdbf5",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#ffbfba",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-container": "#00714d",
+                    "secondary": "#006c49",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-tint": "#1d59c1",
+                    "primary": "#003c90",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "primary-fixed": "#d9e2ff",
+                    "income-emerald": "#10B981",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-tertiary-fixed": "#410004",
+                    "primary-fixed-dim": "#b0c6ff",
+                    "surface-variant": "#d3e4fe",
+                    "expense-rose": "#EF4444",
+                    "tertiary-container": "#b0111e",
+                    "on-surface": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdad7",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-fixed-variant": "#005236",
+                    "surface-container": "#e5eeff",
+                    "on-primary-container": "#bcceff",
+                    "accent-blue": "#3B82F6",
+                    "outline-variant": "#c3c6d5",
+                    "background": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#6cf8bb",
+                    "inverse-surface": "#213145",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "margin-desktop": "48px",
+                    "container-max-width": "1280px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "title-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"></head><body class="font-body-lg text-body-lg">
+<!-- Top Navigation Anchor (Shared Component: TopAppBar) -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface-dark shadow-sm dark:shadow-none flex items-center justify-between px-margin-mobile py-4 w-full z-40">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a friendly Asian businessman in his late 20s, wearing a smart casual blazer. The background is a clean, minimalist architectural space with soft, natural lighting in a Corporate Minimalism style, consistent with the light-mode UI palette of soft blues and whites." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWr53XD3OFf5cX49tDmWiFKUmXa92_Dgt0rx_aVd9hAu7HDOxcZRBY5X2iyhWor2ST4WhqfQUzmD5cJSfzDRD2xHCzAwg6tFmN4eY0B4tMmis5UHWYcn_Vc3nrK3r4fUsstgJT33wHsfoW8T2JDLVo_cYEC8FKSGu2phAqryXbFf07e2QbESly4Jc9_TUTJTUP3tUa0osZSHM_fc62m8F-I2dbwW4xpAXIAnoS0yRtjuTQRmtWhA9dSQ">
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">CashFlow</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low dark:hover:bg-surface-container transition-colors duration-200 active:opacity-70">
+<span class="material-symbols-outlined text-on-surface-variant" data-original-icon="notifications">circle</span>
+</button>
+</header>
+<main class="px-margin-mobile pt-4 pb-24 max-w-lg mx-auto">
+<!-- Period Selector -->
+<section class="mb-8">
+<div class="bg-surface-container-low rounded-xl p-1 flex items-center">
+<button class="flex-1 py-2 text-center font-body-sm text-body-sm rounded-lg transition-all text-on-surface-variant">本周</button>
+<button class="flex-1 py-2 text-center font-body-sm text-body-sm rounded-lg transition-all bg-white shadow-sm text-primary font-semibold">本月</button>
+<button class="flex-1 py-2 text-center font-body-sm text-body-sm rounded-lg transition-all text-on-surface-variant">全年</button>
+</div>
+</section>
+<!-- Main Chart Section -->
+<section class="bg-white rounded-xl p-gutter shadow-[0px_4px_12px_rgba(0,0,0,0.05)] mb-6">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-title-md text-title-md text-on-surface">支出构成</h2>
+<span class="font-data-mono text-data-mono text-primary bg-primary-fixed px-3 py-1 rounded-full">¥12,480.00</span>
+</div>
+<div class="flex flex-col items-center justify-center py-4">
+<div class="pie-chart-container">
+<div class="pie-chart-center">
+<span class="text-on-surface-variant font-label-caps text-label-caps mb-1">总支出</span>
+<span class="text-primary font-headline-lg-mobile text-headline-lg-mobile">¥12.4k</span>
+</div>
+</div>
+</div>
+<!-- Legend Grid -->
+<div class="grid grid-cols-2 gap-4 mt-8">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-[#003c90]"></div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface">住房房租</span>
+<span class="font-data-mono text-xs text-on-surface-variant">45% (¥5,616)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-[#3B82F6]"></div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface">餐饮美食</span>
+<span class="font-data-mono text-xs text-on-surface-variant">25% (¥3,120)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-[#10B981]"></div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface">购物娱乐</span>
+<span class="font-data-mono text-xs text-on-surface-variant">15% (¥1,872)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-[#EF4444]"></div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface">交通出行</span>
+<span class="font-data-mono text-xs text-on-surface-variant">15% (¥1,872)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Insights -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Highest Spending -->
+<div class="bg-white rounded-xl p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-lg" data-original-icon="trending_up">circle</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">最高支出</h3>
+</div>
+<p class="font-title-md text-title-md mb-1">住房房租</p>
+<p class="font-data-mono text-body-sm text-primary">¥5,616.00</p>
+</div>
+<!-- Comparison Section -->
+<div class="bg-white rounded-xl p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-income-emerald">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-income-emerald text-lg" data-original-icon="compare_arrows">circle</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">较上月同期</h3>
+</div>
+<p class="font-title-md text-title-md mb-1 text-income-emerald">-12.5%</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">节省了 ¥1,560</p>
+</div>
+</div>
+<!-- Efficiency Card -->
+<section class="mt-6 bg-primary-container text-white rounded-xl p-6 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-title-md text-title-md mb-2">预算洞察</h3>
+<p class="font-body-sm text-body-sm opacity-90 mb-4">您的“餐饮美食”支出已接近本月预算的 85%，建议减少外卖支出。</p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-expense-rose h-full" style="width: 85%"></div>
+</div>
+</div>
+<!-- Decorative atmospheric effect -->
+<div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+</section>
+<!-- Transaction Highlights -->
+<section class="mt-8">
+<h2 class="font-title-md text-title-md text-on-surface mb-4">主要支出流水</h2>
+<div class="space-y-3">
+<div class="flex items-center justify-between bg-white p-4 rounded-lg hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">home</span>
+</div>
+<div class="">
+<p class="font-body-lg text-body-lg font-medium text-on-surface">万科广场公寓</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">10月1日 · 房租</p>
+</div>
+</div>
+<span class="font-data-mono text-body-lg font-semibold">- ¥5,616.00</span>
+</div>
+<div class="flex items-center justify-between bg-white p-4 rounded-lg hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-original-icon="restaurant">circle</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg font-medium text-on-surface">鼎泰丰晚餐</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">10月12日 · 餐饮</p>
+</div>
+</div>
+<span class="font-data-mono text-body-lg font-semibold">- ¥488.00</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell (Shared Component: BottomNavBar) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-6 bg-surface dark:bg-surface-dark shadow-[0px_-4px_12px_rgba(0,0,0,0.05)] rounded-t-lg"><a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-caps text-label-caps mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-caps text-label-caps mt-1">流水</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-lg px-4 py-2 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-caps text-label-caps mt-1">分析</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-caps text-label-caps mt-1">账户</span>
+</a></nav>
+<script>
+        // Micro-interaction for period selector
+        const buttons = document.querySelectorAll('section div button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => {
+                    b.classList.remove('bg-white', 'shadow-sm', 'text-primary', 'font-semibold');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('bg-white', 'shadow-sm', 'text-primary', 'font-semibold');
+                btn.classList.remove('text-on-surface-variant');
+            });
+        });
+    </script>
+
+
+</body></html>

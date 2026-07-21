@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow - 个人财务记账管理助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        .balance-info {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .balance-item {
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .balance-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .balance-value.income {
+            color: var(--primary-color);
+        }
+
+        .balance-value.expense {
+            color: var(--danger-color);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1976D2;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #da190b;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-category {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .transaction-description {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .transaction-amount.income {
+            color: var(--primary-color);
+        }
+
+        .transaction-amount.expense {
+            color: var(--danger-color);
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .chart-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.warning {
+            background-color: var(--warning-color);
+        }
+
+        .progress-fill.danger {
+            background-color: var(--danger-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: var(--shadow-hover);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            background-color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>💰 CashFlow</h1>
+                <div class="balance-info">
+                    <div class="balance-item">
+                        <div class="balance-label">本月收入</div>
+                        <div class="balance-value income" id="totalIncome">¥0.00</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-label">本月支出</div>
+                        <div class="balance-value expense" id="totalExpense">¥0.00</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-label">净结余</div>
+                        <div class="balance-value" id="netBalance">¥0.00</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📝 添加记账</h2>
+                <form id="transactionForm">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="income" name="type" value="income" checked>
+                            <label for="income">收入</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="expense" name="type" value="expense">
+                            <label for="expense">支出</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount">金额</label>
+                            <input type="number" id="amount" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">分类</label>
+                            <select id="category" required>
+                                <option value="">请选择分类</option>
+                                <option value="餐饮">餐饮</option>
+                                <option value="交通">交通</option>
+                                <option value="购物">购物</option>
+                                <option value="娱乐">娱乐</option>
+                                <option value="工资">工资</option>
+                                <option value="投资">投资</option>
+                                <option value="医疗">医疗</option>
+                                <option value="教育">教育</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">描述</label>
+                        <input type="text" id="description" placeholder="输入描述" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">日期</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">备注（选填）</label>
+                            <textarea id="notes" rows="1" placeholder="添加备注"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">添加记录</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📋 最近账单</h2>
+                <div id="transactionList" class="transaction-list">
+                    <div class="empty-state">
+                        <h3>暂无记录</h3>
+                        <p>添加您的第一笔记账记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="monthTransactions">0</div>
+                <div class="stat-label">本月交易数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgExpense">¥0</div>
+                <div class="stat-label">平均支出</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="topCategory">-</div>
+                <div class="stat-label">最大支出分类</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>📊 本月支出分类</h2>
+            <div id="categoryBreakdown">
+                <div class="empty-state">
+                    <p>暂无支出数据</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // 数据存储
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置今天日期为默认值
+            document.getElementById('date').valueAsDate = new Date();
+
+            // 显示所有数据
+            updateDisplay();
+        });
+
+        // 表单提交
+        document.getElementById('transactionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const selectedType = document.querySelector('input[name="type"]:checked');
+            const type = selectedType ? selectedType.value : 'income';
+            const amount = parseFloat(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+            const notes = document.getElementById('notes').value;
+
+            const transaction = {
+                id: Date.now(),
+                type,
+                amount,
+                category,
+                description,
+                date,
+                notes,
+                timestamp: new Date().toISOString()
+            };
+
+            transactions.unshift(transaction);
+            saveTransactions();
+            updateDisplay();
+
+            // 重置表单
+            document.getElementById('transactionForm').reset();
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('income').checked = true;
+
+            showToast('记账成功！');
+        });
+
+        // 删除交易
+        function deleteTransaction(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveTransactions();
+                updateDisplay();
+                showToast('记录已删除');
+            }
+        }
+
+        // 保存到本地存储
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            updateBalance();
+            updateTransactionList();
+            updateStats();
+            updateCategoryChart();
+        }
+
+        // 更新余额
+        function updateBalance() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+
+            const income = monthTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const expense = monthTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const balance = income - expense;
+
+            document.getElementById('totalIncome').textContent = `¥${income.toFixed(2)}`;
+            document.getElementById('totalExpense').textContent = `¥${expense.toFixed(2)}`;
+            document.getElementById('netBalance').textContent = `¥${balance.toFixed(2)}`;
+
+            // 更新净余额颜色
+            const netBalanceEl = document.getElementById('netBalance');
+            netBalanceEl.style.color = balance >= 0 ? 'var(--primary-color)' : 'var(--danger-color)';
+        }
+
+        // 更新交易列表
+        function updateTransactionList() {
+            const listEl = document.getElementById('transactionList');
+
+            if (transactions.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <h3>暂无记录</h3>
+                        <p>添加您的第一笔记账记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const recentTransactions = transactions.slice(0, 10);
+
+            listEl.innerHTML = recentTransactions.map(t => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-category">${t.category}</div>
+                        <div class="transaction-description">${t.description}</div>
+                        <div class="transaction-date">${formatDate(t.date)}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="transaction-amount ${t.type}">
+                            ${t.type === 'income' ? '+' : '-'}¥${t.amount.toFixed(2)}
+                        </div>
+                        <button class="delete-btn" onclick="deleteTransaction(${t.id})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 更新统计
+        function updateStats() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+
+            const expenseTransactions = monthTransactions.filter(t => t.type === 'expense');
+            const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const avgExpense = expenseTransactions.length > 0 ? totalExpense / expenseTransactions.length : 0;
+
+            // 计算最大支出分类
+            const categoryTotals = {};
+            expenseTransactions.forEach(t => {
+                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+            });
+
+            const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0];
+
+            document.getElementById('monthTransactions').textContent = monthTransactions.length;
+            document.getElementById('avgExpense').textContent = `¥${avgExpense.toFixed(2)}`;
+            document.getElementById('topCategory').textContent = topCategory ? topCategory[0] : '-';
+        }
+
+        // 更新分类图表
+        function updateCategoryChart() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const monthTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+
+            const expenseTransactions = monthTransactions.filter(t => t.type === 'expense');
+
+            if (expenseTransactions.length === 0) {
+                document.getElementById('categoryBreakdown').innerHTML = `
+                    <div class="empty-state">
+                        <p>暂无支出数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 计算分类汇总
+            const categoryTotals = {};
+            expenseTransactions.forEach(t => {
+                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+            });
+
+            // 找出最大金额作为基准
+            const maxAmount = Math.max(...Object.values(categoryTotals));
+
+            // 显示分类进度条
+            document.getElementById('categoryBreakdown').innerHTML = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .map(([category, amount]) => {
+                    const percentage = (amount / maxAmount) * 100;
+                    let progressClass = '';
+                    if (percentage > 80) progressClass = 'danger';
+                    else if (percentage > 50) progressClass = 'warning';
+
+                    return `
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>${category}</span>
+                                <span>¥${amount.toFixed(2)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${progressClass}" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return '今天';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                return '昨天';
+            } else {
+                return `${date.getMonth() + 1}月${date.getDate()}日`;
+            }
+        }
+
+        // 显示提示
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            if (type === 'error') toast.classList.add('error');
+            if (type === 'warning') toast.classList.add('warning');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

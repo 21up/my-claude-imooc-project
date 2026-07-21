@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户中心 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 账户中心页面特定样式 */
+        .account-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-header {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .avatar-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+        }
+
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-edit:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-edit .material-symbols-outlined {
+            font-size: 16px;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-bottom: 16px;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .stat-icon.transactions {
+            background: var(--accent-blue);
+            color: var(--on-primary);
+        }
+
+        .stat-icon.categories {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .stat-icon.months {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-list {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--outline-variant);
+            transition: background-color 0.2s ease;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item:hover {
+            background-color: var(--surface-container-low);
+        }
+
+        .setting-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .setting-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .setting-icon.primary {
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        .setting-icon.secondary {
+            background: var(--secondary-container);
+            color: var(--on-secondary-container);
+        }
+
+        .setting-icon.danger {
+            background: var(--error-container);
+            color: var(--on-error-container);
+        }
+
+        .setting-details {
+            flex: 1;
+        }
+
+        .setting-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 2px;
+        }
+
+        .setting-description {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .setting-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-value {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .chevron-icon {
+            color: var(--on-surface-variant);
+        }
+
+        .danger-zone {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 120px;
+        }
+
+        .danger-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--expense-rose);
+        }
+
+        .danger-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .danger-item:last-child {
+            border-bottom: none;
+        }
+
+        .danger-button {
+            padding: 8px 16px;
+            background: var(--expense-rose);
+            color: var(--on-expense);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .danger-button:hover {
+            background: var(--expense-dark);
+            transform: translateY(-1px);
+        }
+
+        .logout-button {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            color: var(--expense-rose);
+            border: 2px solid var(--expense-rose);
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logout-button:hover {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        /* 编辑模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface-container-low);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--outline-variant);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--surface);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.cancel {
+            background: var(--surface-container-low);
+            color: var(--on-surface);
+        }
+
+        .modal-button.save {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .modal-button.save:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="account-container">
+        <!-- 用户资料头部 -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="https://picsum.photos/seed/avatar/80/80.jpg" alt="用户头像" class="avatar-image" onclick="editProfile()">
+                <div class="avatar-edit" onclick="editProfile()">
+                    <span class="material-symbols-outlined">edit</span>
+                </div>
+            </div>
+            <h1 class="profile-name" id="profile-name">加载中...</h1>
+            <p class="profile-email" id="profile-email">加载中...</p>
+            <div class="profile-badge">
+                <span class="material-symbols-outlined">verified</span>
+                <span>已认证用户</span>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon transactions">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                </div>
+                <div class="stat-value" id="total-transactions">0</div>
+                <div class="stat-label">交易记录</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon categories">
+                    <span class="material-symbols-outlined">category</span>
+                </div>
+                <div class="stat-value">8</div>
+                <div class="stat-label">分类管理</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon months">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                </div>
+                <div class="stat-value" id="using-months">1</div>
+                <div class="stat-label">使用月份</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--primary-color); color: white;">
+                    <span class="material-symbols-outlined">star</span>
+                </div>
+                <div class="stat-value">4.8</div>
+                <div class="stat-label">用户评分</div>
+            </div>
+        </div>
+
+        <!-- 基本设置 -->
+        <div class="settings-section">
+            <h3 class="section-title">
+                <span class="material-symbols-outlined">settings</span>
+                基本设置
+            </h3>
+            <div class="settings-list">
+                <div class="setting-item" onclick="showEditProfile()">
+                    <div class="setting-info">
+                        <div class="setting-icon primary">
+                            <span class="material-symbols-outlined">person</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">个人资料</div>
+                            <div class="setting-description">更新您的个人信息</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">查看</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-icon secondary">
+                            <span class="material-symbols-outlined">lock</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">修改密码</div>
+                            <div class="setting-description">更新您的登录密码</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">修改</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+                <div class="setting-item" onclick="handleExportData()">
+                    <div class="setting-info">
+                        <div class="setting-icon primary">
+                            <span class="material-symbols-outlined">download</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">数据导出</div>
+                            <div class="setting-description">导出您的财务数据</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">导出</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 账户安全 -->
+        <div class="settings-section">
+            <h3 class="section-title">
+                <span class="material-symbols-outlined">security</span>
+                账户安全
+            </h3>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-icon secondary">
+                            <span class="material-symbols-outlined">shield</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">账号安全中心</div>
+                            <div class="setting-description">管理账户安全设置</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">已启用</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-icon secondary">
+                            <span class="material-symbols-outlined">history</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">登录历史</div>
+                            <div class="setting-description">查看最近登录记录</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">上次登录: 2小时前</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-icon secondary">
+                            <span class="material-symbols-outlined">phone_android</span>
+                        </div>
+                        <div class="setting-details">
+                            <div class="setting-name">设备管理</div>
+                            <div class="setting-description">管理已登录设备</div>
+                        </div>
+                    </div>
+                    <div class="setting-action">
+                        <span class="setting-value">2个设备</span>
+                        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 危险操作 -->
+        <div class="danger-zone">
+            <h3 class="danger-title">
+                <span class="material-symbols-outlined">warning</span>
+                危险操作
+            </h3>
+            <div class="danger-item">
+                <div>
+                    <div class="setting-name">清除所有数据</div>
+                    <div class="setting-description">这将删除所有交易记录和设置</div>
+                </div>
+                <button class="danger-button" onclick="clearAllData()">清除数据</button>
+            </div>
+            <div class="danger-item">
+                <div>
+                    <div class="setting-name">注销账户</div>
+                    <div class="setting-description">永久删除您的账户和所有数据</div>
+                </div>
+                <button class="danger-button" onclick="deleteAccount()">注销账户</button>
+            </div>
+            <button class="logout-button" onclick="logout()">
+                <span class="material-symbols-outlined">logout</span>
+                退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 编辑资料模态框 -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑个人资料</h3>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form class="modal-form" onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-input" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" class="form-input" id="edit-email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="tel" class="form-input" id="edit-phone" pattern="[0-9]{11}">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-button cancel" onclick="closeEditModal()">取消</button>
+                    <button type="submit" class="modal-button save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <nav class="nav-bar" id="bottom-nav">
+        <!-- 导航栏将通过 JavaScript 动态创建 -->
+    </nav>
+
+    <script src="js/utils.js"></script>
+    <script>
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查登录状态
+            const user = CashFlowUtils.getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 加载用户资料
+            loadUserProfile();
+
+            // 加载统计数据
+            loadStatistics();
+
+            // 创建底部导航栏
+            createBottomNavBar();
+        });
+
+        // 创建底部导航栏
+        function createBottomNavBar() {
+            const navBar = document.getElementById('bottom-nav');
+            const navItems = [
+                { icon: 'home', label: '首页', page: 'index.html' },
+                { icon: 'receipt_long', label: '流水', page: 'transactions.html' },
+                { icon: 'analytics', label: '分析', page: 'analysis.html' },
+                { icon: 'account_balance_wallet', label: '预算', page: 'budget.html' },
+                { icon: 'account_circle', label: '账户', page: 'account.html', active: true }
+            ];
+
+            const navBarContent = document.createElement('div');
+            navBarContent.className = 'nav-bar-content';
+
+            navItems.forEach(item => {
+                const navItem = document.createElement('a');
+                navItem.href = item.page;
+                navItem.className = `nav-item ${item.active ? 'active' : ''}`;
+                navItem.innerHTML = `
+                    <span class="material-symbols-outlined">${item.icon}</span>
+                    <span>${item.label}</span>
+                `;
+                navBarContent.appendChild(navItem);
+            });
+
+            navBar.appendChild(navBarContent);
+        }
+
+        // 加载用户资料
+        function loadUserProfile() {
+            const user = CashFlowUtils.getCurrentUser();
+            if (user) {
+                document.getElementById('profile-name').textContent = user.displayName;
+                document.getElementById('profile-email').textContent = user.email;
+                document.getElementById('edit-name').value = user.displayName;
+                document.getElementById('edit-email').value = user.email;
+                document.getElementById('edit-phone').value = user.phone || '';
+            }
+        }
+
+        // 加载统计数据
+        function loadStatistics() {
+            const transactions = CashFlowUtils.storage.getTransactions();
+            const totalTransactions = transactions.length;
+
+            // 计算使用月份
+            const months = new Set();
+            transactions.forEach(t => {
+                const month = t.date.substring(0, 7);
+                months.add(month);
+            });
+
+            document.getElementById('total-transactions').textContent = totalTransactions;
+            document.getElementById('using-months').textContent = months.size;
+        }
+
+        // 显示编辑资料模态框
+        function showEditProfile() {
+            document.getElementById('edit-modal').classList.add('show');
+        }
+
+        // 关闭编辑模态框
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('show');
+        }
+
+        // 保存个人资料
+        function saveProfile(event) {
+            event.preventDefault();
+
+            const user = CashFlowUtils.getCurrentUser();
+            const newName = document.getElementById('edit-name').value;
+            const newEmail = document.getElementById('edit-email').value;
+            const newPhone = document.getElementById('edit-phone').value;
+
+            // 更新用户信息
+            user.displayName = newName;
+            user.email = newEmail;
+            user.phone = newPhone;
+
+            // 保存到本地存储
+            localStorage.setItem('cashflow_user', JSON.stringify(user));
+
+            // 更新页面显示
+            loadUserProfile();
+            closeEditModal();
+
+            CashFlowUtils.notification.success('个人资料已更新');
+        }
+
+        // 编辑资料（点击头像）
+        function editProfile() {
+            showEditProfile();
+        }
+
+        // 导出数据
+        function handleExportData() {
+            CashFlowUtils.exportData.toJSON();
+            CashFlowUtils.notification.success('数据导出成功');
+        }
+
+        // 清除所有数据
+        function clearAllData() {
+            if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                if (confirm('再次确认：这将删除所有交易记录和设置！')) {
+                    CashFlowUtils.storage.clearAll();
+                    CashFlowUtils.notification.success('所有数据已清除');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                }
+            }
+        }
+
+        // 注销账户
+        function deleteAccount() {
+            if (confirm('确定要注销账户吗？此操作不可恢复！')) {
+                if (confirm('警告：这将永久删除您的账户和所有数据！')) {
+                    CashFlowUtils.storage.clearAll();
+                    logout();
+                }
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            CashFlowUtils.logout();
+            // 跳转到登录页面
+            window.location.href = 'login.html';
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>

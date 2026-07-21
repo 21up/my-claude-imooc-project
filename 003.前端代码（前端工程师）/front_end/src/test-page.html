@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
+    <script src="js/navbar.js"></script>
+</head>
+<body>
+    <h1>测试页面</h1>
+    <p>如果你能看到这个页面，说明导航基本工作</p>
+    <div id="test-content"></div>
+
+    <script>
+        console.log('测试脚本开始执行');
+
+        // 测试CashFlowUtils是否可用
+        if (window.CashFlowUtils) {
+            console.log('CashFlowUtils 可用');
+            document.getElementById('test-content').innerHTML = '<p>✅ CashFlowUtils 正常加载</p>';
+        } else {
+            console.log('CashFlowUtils 不可用');
+            document.getElementById('test-content').innerHTML = '<p>❌ CashFlowUtils 未加载</p>';
+        }
+
+        // 测试DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded 事件触发');
+            document.getElementById('test-content').innerHTML += '<p>✅ DOM 加载完成</p>';
+        });
+    </script>
+</body>
+</html>

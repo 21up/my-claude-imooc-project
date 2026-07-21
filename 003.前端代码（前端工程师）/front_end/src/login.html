@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .login-container {
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            padding: 48px 40px;
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .logo span {
+            font-size: 40px;
+            color: var(--on-primary);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--on-surface-variant);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--surface-container-low);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--surface);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--on-surface-variant);
+        }
+
+        .form-input.input-with-icon {
+            padding-left: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--on-surface-variant);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 60, 144, 0.3);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--outline-variant);
+        }
+
+        .divider span {
+            background: var(--surface);
+            padding: 0 16px;
+            position: relative;
+            color: var(--on-surface-variant);
+            font-size: 14px;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 32px;
+            color: var(--on-surface-variant);
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <div class="logo">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+            </div>
+            <h1>欢迎回来</h1>
+            <p class="subtitle">登录您的 CashFlow 账户</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label" for="username">用户名或邮箱</label>
+                <div class="input-group">
+                    <span class="material-symbols-outlined input-icon">person</span>
+                    <input type="text" id="username" class="form-input input-with-icon" placeholder="请输入用户名或邮箱" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">密码</label>
+                <div class="input-group">
+                    <span class="material-symbols-outlined input-icon">lock</span>
+                    <input type="password" id="password" class="form-input input-with-icon" placeholder="请输入密码" required>
+                    <span class="material-symbols-outlined password-toggle" onclick="togglePassword()">visibility</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">登录</button>
+        </form>
+
+        <div class="divider">
+            <span>或者</span>
+        </div>
+
+        <div class="forgot-password">
+            <a href="#">忘记密码？</a>
+        </div>
+
+        <div class="signup-link">
+            还没有账户？<a href="register.html">立即注册</a>
+        </div>
+    </div>
+
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+
+    <script>
+        // 切换密码显示/隐藏
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = 'visibility';
+            }
+        }
+
+        // 处理登录
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 简单的验证
+            if (!username || !password) {
+                CashFlowUtils.notification.error('请填写所有必填字段');
+                return;
+            }
+
+            // 这里应该调用后端 API 进行验证
+            // 现在使用模拟数据
+            const mockUser = {
+                id: 1,
+                username: username,
+                email: username + '@example.com',
+                displayName: username === 'admin' ? '管理员' : '用户' + username,
+                avatar: 'https://via.placeholder.com/80'
+            };
+
+            // 模拟登录延迟
+            setTimeout(() => {
+                // 保存用户信息
+                CashFlowUtils.login(mockUser);
+
+                // 跳转到主页
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // 页面加载时检查是否已登录
+        document.addEventListener('DOMContentLoaded', function() {
+            if (CashFlowUtils.getCurrentUser()) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

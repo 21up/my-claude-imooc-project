@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d5",
+                        "on-primary-fixed": "#001945",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "tertiary": "#870011",
+                        "surface-container": "#e5eeff",
+                        "expense-rose": "#EF4444",
+                        "on-tertiary-fixed": "#410004",
+                        "inverse-surface": "#213145",
+                        "background": "#f8f9ff",
+                        "tertiary-container": "#b0111e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "income-emerald": "#10B981",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed": "#ffdad7",
+                        "secondary-fixed-dim": "#4edea3",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#00714d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#002113",
+                        "accent-blue": "#3B82F6",
+                        "on-primary-container": "#bcceff",
+                        "outline": "#737784",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-container": "#ffbfba",
+                        "surface-variant": "#d3e4fe",
+                        "inverse-primary": "#b0c6ff",
+                        "surface-tint": "#1d59c1",
+                        "secondary-container": "#6cf8bb",
+                        "surface-dark": "#0F172A",
+                        "on-primary-fixed-variant": "#00419c",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-surface-variant": "#434653",
+                        "on-secondary-fixed-variant": "#005236",
+                        "background-light": "#F8FAFC",
+                        "secondary": "#006c49",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-container-low": "#eff4ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9ff",
+                        "primary-container": "#0f52ba",
+                        "primary": "#003c90",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "title-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script>
+<style>
+        .active-tab-expense {
+            background-color: #EF4444;
+            color: white;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+        .active-tab-income {
+            background-color: #10B981;
+            color: white;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head><body class="bg-background min-h-screen flex items-end">
+<!-- Bottom Sheet Wrapper -->
+<div class="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300" id="overlay"></div>
+<div class="relative z-50 w-full bg-white rounded-t-[24px] overflow-hidden transform transition-transform duration-500 translate-y-0" id="modal-sheet">
+<!-- Drag Handle -->
+<div class="flex justify-center pt-3 pb-2">
+<div class="w-12 h-1.5 bg-outline-variant/30 rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="px-margin-mobile flex justify-between items-center py-2">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">快速记账</h1>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors" id="close-btn">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Scrollable Content -->
+<div class="px-margin-mobile pb-24 space-y-6 max-h-[85vh] overflow-y-auto">
+<!-- 1. Tabs: Income/Expense -->
+<div class="bg-surface-container-low p-1.5 rounded-xl flex">
+<button class="flex-1 py-3 rounded-lg font-title-md text-title-md transition-all duration-200 active-tab-expense" id="expense-tab">
+                    支出
+                </button>
+<button class="flex-1 py-3 rounded-lg font-title-md text-title-md transition-all duration-200 text-on-surface-variant" id="income-tab">
+                    收入
+                </button>
+</div>
+<!-- 2. Amount Input -->
+<div class="text-center py-6">
+<div class="flex items-baseline justify-center gap-2">
+<span class="font-display-lg text-display-lg text-on-surface-variant">¥</span>
+<input autofocus="" class="w-2/3 border-none text-center font-display-lg text-display-lg bg-transparent text-on-surface placeholder:text-outline-variant focus:ring-0" placeholder="0.00" step="0.01" type="number"/>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-2">请输入交易金额</p>
+</div>
+<!-- 3. Category Grid -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">分类</h3>
+<button class="text-primary font-body-sm text-body-sm">管理</button>
+</div>
+<div class="grid grid-cols-4 gap-4" id="category-grid">
+<!-- Categories will be rendered here via JS -->
+</div>
+</div>
+<!-- 4. Date & Note Section -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-body-sm text-body-sm font-semibold text-on-surface-variant px-1">日期</label>
+<div class="flex items-center gap-3 bg-surface-container-low p-4 rounded-xl border border-transparent focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today">calendar_today</span>
+<input class="bg-transparent border-none p-0 font-body-lg text-body-lg text-on-surface focus:ring-0 w-full" id="date-input" type="date" value="2023-10-27"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-body-sm text-body-sm font-semibold text-on-surface-variant px-1">备注</label>
+<div class="flex items-center gap-3 bg-surface-container-low p-4 rounded-xl border border-transparent focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-outline" data-icon="edit_note">edit_note</span>
+<input class="bg-transparent border-none p-0 font-body-lg text-body-lg text-on-surface focus:ring-0 w-full" placeholder="在此输入备注..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- 6. Floating Save Button -->
+<div class="absolute bottom-0 left-0 w-full p-margin-mobile bg-white/80 backdrop-blur-md border-t border-outline-variant/10">
+<button class="w-full bg-primary py-4 rounded-2xl text-white font-headline-lg-mobile text-headline-lg-mobile shadow-lg shadow-primary/20 active:scale-95 transition-transform duration-150">
+                保存记账
+            </button>
+</div>
+</div>
+<script>
+        const categories = [
+            { id: 'food', name: '餐饮', icon: 'restaurant', color: 'bg-orange-100 text-orange-600' },
+            { id: 'transport', name: '交通', icon: 'directions_car', color: 'bg-blue-100 text-blue-600' },
+            { id: 'shopping', name: '购物', icon: 'shopping_bag', color: 'bg-purple-100 text-purple-600' },
+            { id: 'entertainment', name: '娱乐', icon: 'movie', color: 'bg-rose-100 text-rose-600' },
+            { id: 'groceries', name: '买菜', icon: 'shopping_cart', color: 'bg-emerald-100 text-emerald-600' },
+            { id: 'health', name: '医疗', icon: 'medical_services', color: 'bg-cyan-100 text-cyan-600' },
+            { id: 'education', name: '学习', icon: 'school', color: 'bg-indigo-100 text-indigo-600' },
+            { id: 'more', name: '更多', icon: 'more_horiz', color: 'bg-gray-100 text-gray-600' }
+        ];
+
+        const grid = document.getElementById('category-grid');
+        let selectedCategory = 'food';
+
+        function renderCategories() {
+            grid.innerHTML = categories.map(cat => `
+                <div onclick="selectCategory('${cat.id}')" class="flex flex-col items-center gap-2 cursor-pointer transition-transform active:scale-90">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${selectedCategory === cat.id ? 'ring-2 ring-primary ring-offset-2' : ''} ${cat.color}">
+                        <span class="material-symbols-outlined text-[28px]">${cat.icon}</span>
+                    </div>
+                    <span class="font-body-sm text-[12px] text-on-surface-variant font-medium">${cat.name}</span>
+                </div>
+            `).join('');
+        }
+
+        window.selectCategory = (id) => {
+            selectedCategory = id;
+            renderCategories();
+        };
+
+        // Tab Switching
+        const expenseTab = document.getElementById('expense-tab');
+        const incomeTab = document.getElementById('income-tab');
+
+        expenseTab.addEventListener('click', () => {
+            expenseTab.classList.add('active-tab-expense');
+            expenseTab.classList.remove('text-on-surface-variant');
+            incomeTab.classList.remove('active-tab-income');
+            incomeTab.classList.add('text-on-surface-variant');
+        });
+
+        incomeTab.addEventListener('click', () => {
+            incomeTab.classList.add('active-tab-income');
+            incomeTab.classList.remove('text-on-surface-variant');
+            expenseTab.classList.remove('active-tab-expense');
+            expenseTab.classList.add('text-on-surface-variant');
+        });
+
+        // Set Default Date to Today
+        const dateInput = document.getElementById('date-input');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+
+        // Modal Close (Simulated)
+        const closeBtn = document.getElementById('close-btn');
+        const overlay = document.getElementById('overlay');
+        const sheet = document.getElementById('modal-sheet');
+
+        const closeModal = () => {
+            sheet.style.transform = 'translateY(100%)';
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                alert("这是UI演示。表单将在此处关闭。");
+                sheet.style.transform = 'translateY(0)';
+                overlay.style.opacity = '1';
+            }, 500);
+        };
+
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+
+        renderCategories();
+    </script>
+</body></html>

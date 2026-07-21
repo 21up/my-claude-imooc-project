@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记账 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+    <script src="js/navbar.js"></script>
+    <style>
+        /* 记账页面特定样式 */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 16px;
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .type-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .type-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        .type-btn.income.active {
+            background: var(--income-emerald);
+            color: var(--on-income);
+            border-color: var(--income-emerald);
+        }
+
+        .type-btn.expense.active {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+            border-color: var(--expense-rose);
+        }
+
+        .type-btn .material-symbols-outlined {
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--surface);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--surface-bright);
+        }
+
+        .amount-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .currency-symbol {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--on-surface-variant);
+            padding: 0 8px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .category-item {
+            padding: 12px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            background: var(--surface);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .category-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+        }
+
+        .category-item.active {
+            border-color: var(--primary-color);
+            background: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        .category-item.income.active {
+            background: var(--income-emerald);
+            color: var(--on-income);
+            border-color: var(--income-emerald);
+        }
+
+        .category-item.expense.active {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+            border-color: var(--expense-rose);
+        }
+
+        .category-item .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+        .category-item .name {
+            font-size: 12px;
+        }
+
+        .custom-category-input {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .custom-category-input.show {
+            display: block;
+        }
+
+        .date-time-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 60, 144, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: var(--outline-variant);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-fill-section {
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--surface-container-low);
+            border-radius: 12px;
+        }
+
+        .quick-fill-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--on-surface);
+        }
+
+        .quick-fill-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface-container);
+            border: 1px solid var(--outline-variant);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .quick-fill-btn:hover {
+            background: var(--surface-container-high);
+            border-color: var(--primary-color);
+        }
+
+        .quick-fill-btn .material-symbols-outlined {
+            font-size: 20px;
+            color: var(--on-surface-variant);
+        }
+
+        .submit-section {
+            position: sticky;
+            bottom: 80px;
+            background: var(--surface);
+            padding: 20px;
+            border-top: 1px solid var(--outline-variant);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- 顶部 AppBar -->
+        <header class="w-full top-0 sticky z-40 bg-surface shadow-sm flex items-center justify-between px-margin-mobile py-4">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <h1 class="text-xl font-bold text-on-surface">记账</h1>
+            </div>
+        </header>
+
+        <!-- 表单内容 -->
+        <main class="pb-24">
+            <!-- 类型选择器 -->
+            <div class="type-selector">
+                <button class="type-btn expense active" data-type="expense" onclick="selectType('expense')">
+                    <span class="material-symbols-outlined">remove_circle</span>
+                    <span>支出</span>
+                </button>
+                <button class="type-btn income" data-type="income" onclick="selectType('income')">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    <span>收入</span>
+                </button>
+            </div>
+
+            <!-- 金额输入 -->
+            <div class="form-group">
+                <label class="form-label">金额</label>
+                <div class="amount-input-group">
+                    <span class="currency-symbol">¥</span>
+                    <input type="number" class="form-input" id="amount" placeholder="0.00" step="0.01" min="0" oninput="validateForm()">
+                </div>
+            </div>
+
+            <!-- 分类选择 -->
+            <div class="form-group">
+                <label class="form-label">分类</label>
+                <div class="category-grid" id="category-grid">
+                    <!-- 分类将通过 JavaScript 动态生成 -->
+                </div>
+                <input type="text" class="form-input custom-category-input" id="custom-category-input" placeholder="自定义分类名称">
+            </div>
+
+            <!-- 交易信息 -->
+            <div class="form-group">
+                <label class="form-label">描述</label>
+                <input type="text" class="form-input" id="description" placeholder="请输入交易描述" oninput="validateForm()">
+            </div>
+
+            <!-- 日期和时间 -->
+            <div class="date-time-group">
+                <div class="form-group">
+                    <label class="form-label">日期</label>
+                    <input type="date" class="form-input" id="date" onchange="validateForm()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">时间</label>
+                    <input type="time" class="form-input" id="time" onchange="validateForm()">
+                </div>
+            </div>
+
+            <!-- 备注 -->
+            <div class="form-group">
+                <label class="form-label">备注（可选）</label>
+                <textarea class="form-input" id="notes" rows="3" placeholder="添加备注信息"></textarea>
+            </div>
+
+            <!-- 快速填充 -->
+            <div class="quick-fill-section">
+                <div class="quick-fill-title">快速填充</div>
+                <button class="quick-fill-btn" onclick="quickFill('breakfast')">
+                    <span>
+                        <span class="material-symbols-outlined">restaurant</span>
+                        早餐
+                    </span>
+                    <span>¥15</span>
+                </button>
+                <button class="quick-fill-btn" onclick="quickFill('lunch')">
+                    <span>
+                        <span class="material-symbols-outlined">lunch_dining</span>
+                        午餐
+                    </span>
+                    <span>¥25</span>
+                </button>
+                <button class="quick-fill-btn" onclick="quickFill('dinner')">
+                    <span>
+                        <span class="material-symbols-outlined">dinner_dining</span>
+                        晚餐
+                    </span>
+                    <span>¥35</span>
+                </button>
+                <button class="quick-fill-btn" onclick="quickFill('transport')">
+                    <span>
+                        <span class="material-symbols-outlined">directions_bus</span>
+                        交通
+                    </span>
+                    <span>¥5</span>
+                </button>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="submit-section">
+                <button class="submit-btn" id="submit-btn" disabled onclick="submitTransaction()">
+                    保存交易
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let selectedType = 'expense';
+        let selectedCategory = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Add transaction page loaded');
+
+            // 设置默认日期为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+
+            // 设置默认时间为当前时间
+            const now = new Date();
+            document.getElementById('time').value = now.toTimeString().slice(0, 5);
+
+            // 默认选择支出
+            selectType('expense');
+        });
+
+        // 选择交易类型
+        function selectType(type) {
+            selectedType = type;
+
+            // 更新按钮状态
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+
+            // 更新分类选择
+            updateCategories();
+        }
+
+        // 更新分类选择
+        function updateCategories() {
+            const categoryGrid = document.getElementById('category-grid');
+            const categories = CashFlowUtils.getCategories(selectedType);
+
+            categoryGrid.innerHTML = categories.map(category => `
+                <div class="category-item ${selectedType}" data-id="${category.id}" onclick="selectCategory('${category.id}')">
+                    <span class="material-symbols-outlined">${category.icon}</span>
+                    <span class="name">${category.name}</span>
+                </div>
+            `).join('');
+
+            // 隐藏自定义分类输入
+            document.getElementById('custom-category-input').classList.remove('show');
+            selectedCategory = null;
+        }
+
+        // 选择分类
+        function selectCategory(categoryId) {
+            // 更新选中状态
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-id="${categoryId}"]`).classList.add('active');
+
+            selectedCategory = categoryId;
+            validateForm();
+        }
+
+        // 验证表单
+        function validateForm() {
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+            const submitBtn = document.getElementById('submit-btn');
+
+            const isValid = amount && description && date && selectedCategory;
+            submitBtn.disabled = !isValid;
+        }
+
+        // 快速填充
+        function quickFill(type) {
+            const quickFillData = {
+                breakfast: { amount: 15, category: 'food', description: '早餐' },
+                lunch: { amount: 25, category: 'food', description: '午餐' },
+                dinner: { amount: 35, category: 'food', description: '晚餐' },
+                transport: { amount: 5, category: 'transport', description: '交通' }
+            };
+
+            const data = quickFillData[type];
+            if (data) {
+                document.getElementById('amount').value = data.amount;
+                document.getElementById('description').value = data.description;
+
+                // 选择对应的分类
+                const categoryItem = document.querySelector(`[data-id="${data.category}"]`);
+                if (categoryItem) {
+                    categoryItem.click();
+                }
+
+                validateForm();
+            }
+        }
+
+        // 提交交易
+        function submitTransaction() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const notes = document.getElementById('notes').value;
+
+            // 组合日期和时间
+            const datetime = new Date(`${date}T${time}`);
+            const transactionDate = CashFlowUtils.formatDate.toISOString(datetime);
+
+            // 创建交易对象
+            const transaction = {
+                id: Date.now(),
+                type: selectedType,
+                amount: amount,
+                category: selectedCategory,
+                description: description,
+                date: transactionDate,
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+
+            // 保存交易
+            CashFlowUtils.storage.saveTransaction(transaction);
+
+            // 显示成功提示
+            CashFlowUtils.notification.success('交易记录已保存');
+
+            // 跳转到交易列表
+            setTimeout(() => {
+                window.location.href = 'transactions.html';
+            }, 1500);
+        }
+
+        // 初始化分类
+        updateCategories();
+    </script>
+</body>
+</html>

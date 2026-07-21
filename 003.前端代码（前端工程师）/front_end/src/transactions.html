@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流水账单 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+    <style>
+        /* 账单列表页面特定样式 */
+        .transactions-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--outline-variant);
+            border-radius: 20px;
+            background: var(--surface);
+            color: var(--on-surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border-color: var(--primary-color);
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--surface);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .transaction-list {
+            min-height: 400px;
+        }
+
+        .transaction-group {
+            margin-bottom: 24px;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .group-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .group-date {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--surface);
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .transaction-item:hover {
+            background: var(--surface-container-low);
+            transform: translateY(-2px);
+        }
+
+        .transaction-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon-wrapper.income {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .transaction-icon-wrapper.expense {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .transaction-icon {
+            font-size: 24px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .transaction-meta {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .transaction-amount {
+            font-family: var(--font-family-mono);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .transaction-amount.income {
+            color: var(--income-emerald);
+        }
+
+        .transaction-amount.expense {
+            color: var(--expense-rose);
+        }
+
+        .summary-section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .summary-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: var(--font-family-mono);
+            margin-bottom: 4px;
+        }
+
+        .summary-value.income {
+            color: var(--income-emerald);
+        }
+
+        .summary-value.expense {
+            color: var(--expense-rose);
+        }
+
+        .summary-value.balance {
+            color: var(--primary-color);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface-container-low);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--outline-variant);
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: var(--on-surface);
+            font-weight: 500;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.delete {
+            background: var(--error);
+            color: var(--on-error);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--error-dark);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="transactions-container">
+        <!-- 搜索和筛选 -->
+        <div class="search-section">
+            <input type="text" class="search-input" id="search-input" placeholder="搜索交易记录...">
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="income">收入</button>
+            <button class="filter-btn" data-filter="expense">支出</button>
+            <button class="filter-btn" data-filter="month">本月</button>
+        </div>
+
+        <!-- 交易列表 -->
+        <div class="transaction-list" id="transaction-list">
+            <div class="loading-state">
+                <span class="material-symbols-outlined spinning">refresh</span>
+                <p>加载中...</p>
+            </div>
+        </div>
+
+        <!-- 统计摘要 -->
+        <div class="summary-section">
+            <h3 class="summary-title">本月统计</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value income" id="month-income">¥0.00</div>
+                    <div class="summary-label">收入</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value expense" id="month-expense">¥0.00</div>
+                    <div class="summary-label">支出</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value balance" id="month-balance">¥0.00</div>
+                    <div class="summary-label">结余</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交易详情模态框 -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">交易详情</h3>
+                <button class="close-btn" onclick="closeDetailModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="modal-body">
+                <!-- 详情内容将通过 JavaScript 动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let transactions = [];
+        let currentFilter = 'all';
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Transactions page loaded');
+
+            // 显示加载状态
+            const listContainer = document.getElementById('transaction-list');
+            listContainer.innerHTML = `
+                <div class="loading-state">
+                    <span class="material-symbols-outlined spinning">refresh</span>
+                    <p>加载中...</p>
+                </div>
+            `;
+
+            // 延迟加载，确保页面渲染完成
+            setTimeout(() => {
+                loadTransactions();
+            }, 300);
+        });
+
+        // 加载交易记录
+        function loadTransactions() {
+            transactions = CashFlowUtils.storage.getTransactions();
+            filterTransactions();
+            renderTransactions();
+            updateSummary();
+        }
+
+        // 筛选交易记录
+        function filterTransactions() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+
+            let filteredTransactions = [...transactions];
+
+            // 按类型筛选
+            if (currentFilter === 'income') {
+                filteredTransactions = filteredTransactions.filter(t => t.type === 'income');
+            } else if (currentFilter === 'expense') {
+                filteredTransactions = filteredTransactions.filter(t => t.type === 'expense');
+            } else if (currentFilter === 'month') {
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                filteredTransactions = filteredTransactions.filter(t => t.date.slice(0, 7) === currentMonth);
+            }
+
+            // 搜索筛选
+            if (searchInput) {
+                filteredTransactions = filteredTransactions.filter(transaction => {
+                    return transaction.description.toLowerCase().includes(searchInput) ||
+                           transaction.category.toLowerCase().includes(searchInput) ||
+                           (transaction.notes && transaction.notes.toLowerCase().includes(searchInput));
+                });
+            }
+
+            // 按日期倒序排列
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        // 渲染交易列表
+        function renderTransactions() {
+            const listContainer = document.getElementById('transaction-list');
+            const filteredTransactions = transactions.filter(t => {
+                if (currentFilter === 'income') return t.type === 'income';
+                if (currentFilter === 'expense') return t.type === 'expense';
+                if (currentFilter === 'month') {
+                    const currentMonth = new Date().toISOString().slice(0, 7);
+                    return t.date.slice(0, 7) === currentMonth;
+                }
+                return true;
+            });
+
+            if (filteredTransactions.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <p>暂无交易记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按日期分组
+            const groupedTransactions = {};
+            filteredTransactions.forEach(transaction => {
+                const date = transaction.date;
+                if (!groupedTransactions[date]) {
+                    groupedTransactions[date] = [];
+                }
+                groupedTransactions[date].push(transaction);
+            });
+
+            // 按日期排序（倒序）
+            const sortedDates = Object.keys(groupedTransactions).sort((a, b) => new Date(b) - new Date(a));
+
+            listContainer.innerHTML = sortedDates.map(date => {
+                const dayTransactions = groupedTransactions[date];
+                const dateStr = CashFlowUtils.formatDate.relative(date);
+                const dayTotalIncome = dayTransactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                const dayTotalExpense = dayTransactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                return `
+                    <div class="transaction-group">
+                        <div class="group-header">
+                            <div>
+                                <div class="group-title">${dateStr}</div>
+                                <div class="group-date">
+                                    收入 +¥${CashFlowUtils.formatCurrency.format(dayTotalIncome)} |
+                                    支出 -¥${CashFlowUtils.formatCurrency.format(dayTotalExpense)}
+                                </div>
+                            </div>
+                        </div>
+                        ${dayTransactions.map(transaction => renderTransactionItem(transaction)).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染单个交易项
+        function renderTransactionItem(transaction) {
+            const category = CashFlowUtils.getCategory(transaction.type, transaction.category);
+            const timeStr = new Date(transaction.date).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = CashFlowUtils.formatDate.relative(transaction.date);
+
+            return `
+                <div class="transaction-item" onclick="showTransactionDetail('${transaction.id}')">
+                    <div class="transaction-icon-wrapper ${transaction.type}">
+                        <span class="material-symbols-outlined transaction-icon">${category.icon}</span>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-name">${transaction.description}</div>
+                        <div class="transaction-meta">
+                            ${category.name} · ${timeStr}
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.type}">
+                        ${transaction.type === 'income' ? '+' : '-'}¥${CashFlowUtils.formatCurrency.format(transaction.amount)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新统计摘要
+        function updateSummary() {
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const monthTransactions = transactions.filter(t => t.date.slice(0, 7) === currentMonth);
+
+            const monthIncome = monthTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const monthExpense = monthTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const monthBalance = monthIncome - monthExpense;
+
+            document.getElementById('month-income').textContent = CashFlowUtils.formatCurrency.format(monthIncome);
+            document.getElementById('month-expense').textContent = CashFlowUtils.formatCurrency.format(monthExpense);
+            document.getElementById('month-balance').textContent = CashFlowUtils.formatCurrency.format(monthBalance);
+        }
+
+        // 显示交易详情
+        function showTransactionDetail(transactionId) {
+            const transaction = transactions.find(t => t.id == transactionId);
+            if (!transaction) return;
+
+            const category = CashFlowUtils.getCategory(transaction.type, transaction.category);
+            const formattedDate = CashFlowUtils.formatDate.chinese(transaction.date);
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-label">交易类型</div>
+                    <div class="detail-value">${transaction.type === 'income' ? '收入' : '支出'}</div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">分类</div>
+                    <div class="detail-value">${category.name}</div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">金额</div>
+                    <div class="detail-value ${transaction.type}">
+                        ${transaction.type === 'income' ? '+' : '-'}¥${CashFlowUtils.formatCurrency.format(transaction.amount)}
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">日期</div>
+                    <div class="detail-value">${formattedDate}</div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-label">描述</div>
+                    <div class="detail-value">${transaction.description}</div>
+                </div>
+                ${transaction.notes ? `
+                <div class="detail-section">
+                    <div class="detail-label">备注</div>
+                    <div class="detail-value">${transaction.notes}</div>
+                </div>
+                ` : ''}
+                <div class="detail-actions">
+                    <button class="action-btn delete" onclick="deleteTransaction('${transactionId}')">
+                        删除交易
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('detail-modal').classList.add('show');
+        }
+
+        // 关闭详情模态框
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.remove('show');
+        }
+
+        // 删除交易
+        function deleteTransaction(transactionId) {
+            if (confirm('确定要删除这笔交易吗？')) {
+                CashFlowUtils.storage.deleteTransaction(transactionId);
+                loadTransactions();
+                closeDetailModal();
+            }
+        }
+
+        // 筛选按钮事件
+        document.addEventListener('DOMContentLoaded', function() {
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                loadTransactions();
+            });
+
+            // 筛选按钮
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    loadTransactions();
+                });
+            });
+        });
+
+        // 添加一些示例数据（如果没有数据的话）
+        if (CashFlowUtils.storage.getTransactions().length === 0) {
+            const sampleTransactions = [
+                {
+                    id: Date.now(),
+                    type: 'income',
+                    amount: 5000,
+                    category: 'salary',
+                    description: '7月工资',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '月度工资'
+                },
+                {
+                    id: Date.now() + 1,
+                    type: 'expense',
+                    amount: 1500,
+                    category: 'housing',
+                    description: '房租',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '7月份房租'
+                },
+                {
+                    id: Date.now() + 2,
+                    type: 'expense',
+                    amount: 200,
+                    category: 'food',
+                    description: '午餐',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 86400000)),
+                    notes: '商务午餐'
+                },
+                {
+                    id: Date.now() + 3,
+                    type: 'expense',
+                    amount: 89,
+                    category: 'transport',
+                    description: '地铁',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 2 * 86400000)),
+                    notes: '通勤'
+                }
+            ];
+
+            sampleTransactions.forEach(transaction => {
+                CashFlowUtils.storage.saveTransaction(transaction);
+            });
+        }
+    </script>
+    <!-- 底部导航栏 -->
+    <nav class="nav-bar" id="bottom-nav">
+        <!-- 导航栏将通过 JavaScript 动态创建 -->
+    </nav>
+</body>
+</html>
+
+<script>
+    // 创建底部导航栏
+    function createBottomNavBar() {
+        const navBar = document.getElementById('bottom-nav');
+        const navItems = [
+            { icon: 'home', label: '首页', page: 'index.html' },
+            { icon: 'receipt_long', label: '流水', page: 'transactions.html', active: true },
+            { icon: 'analytics', label: '分析', page: 'analysis.html' },
+            { icon: 'account_balance_wallet', label: '预算', page: 'budget.html' },
+            { icon: 'account_circle', label: '账户', page: 'account.html' }
+        ];
+
+        const navBarContent = document.createElement('div');
+        navBarContent.className = 'nav-bar-content';
+
+        navItems.forEach(item => {
+            const navItem = document.createElement('a');
+            navItem.href = item.page;
+            navItem.className = `nav-item ${item.active ? 'active' : ''}`;
+            navItem.innerHTML = `
+                <span class="material-symbols-outlined">${item.icon}</span>
+                <span>${item.label}</span>
+            `;
+            navBarContent.appendChild(navItem);
+        });
+
+        navBar.appendChild(navBarContent);
+    }
+
+    // 页面加载时初始化导航栏
+    document.addEventListener('DOMContentLoaded', function() {
+        // 创建底部导航栏
+        createBottomNavBar();
+
+        // 显示加载状态
+        const listContainer = document.getElementById('transaction-list');
+        listContainer.innerHTML = `
+            <div class="loading-state">
+                <span class="material-symbols-outlined spinning">refresh</span>
+                <p>加载中...</p>
+            </div>
+        `;
+
+        // 延迟加载，确保页面渲染完成
+        setTimeout(() => {
+            loadTransactions();
+        }, 300);
+    });
+</script>
+</body>
+</html>

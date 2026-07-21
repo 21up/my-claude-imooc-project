@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航测试 - CashFlow</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--surface-light);
+        }
+
+        .test-container {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .nav-item {
+            background: var(--surface-container-low);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--on-surface);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 60, 144, 0.1);
+        }
+
+        .nav-item.primary {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .nav-item.primary:hover {
+            background: var(--primary-light);
+        }
+
+        .nav-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .nav-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .nav-desc {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .status-section {
+            background: var(--surface-container-low);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            color: var(--on-surface);
+        }
+
+        .status-value {
+            font-weight: 600;
+        }
+
+        .login-required {
+            text-align: center;
+            padding: 40px;
+            color: var(--on-surface-variant);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: var(--surface-container);
+            color: var(--on-surface);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-container-high);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>CashFlow 导航测试</h1>
+
+        <div id="loginStatus" class="status-section">
+            <div class="status-item">
+                <span class="status-label">登录状态</span>
+                <span class="status-value" id="loginStatusText">未登录</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">用户信息</span>
+                <span class="status-value" id="userInfo">-</span>
+            </div>
+        </div>
+
+        <div class="nav-grid">
+            <a href="index.html" class="nav-item primary">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-title">主页</div>
+                <div class="nav-desc">仪表板概览</div>
+            </a>
+
+            <a href="login.html" class="nav-item">
+                <div class="nav-icon">🔐</div>
+                <div class="nav-title">登录</div>
+                <div class="nav-desc">用户登录</div>
+            </a>
+
+            <a href="register.html" class="nav-item">
+                <div class="nav-icon">📝</div>
+                <div class="nav-title">注册</div>
+                <div class="nav-desc">创建账户</div>
+            </a>
+
+            <a href="add-transaction.html" class="nav-item">
+                <div class="nav-icon">➕</div>
+                <div class="nav-title">记账</div>
+                <div class="nav-desc">快速记账</div>
+            </a>
+
+            <a href="transactions.html" class="nav-item">
+                <div class="nav-icon">📋</div>
+                <div class="nav-title">流水账单</div>
+                <div class="nav-desc">查看交易记录</div>
+            </a>
+
+            <a href="analysis.html" class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div class="nav-title">统计分析</div>
+                <div class="nav-desc">数据分析</div>
+            </a>
+
+            <a href="budget.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-title">预算管理</div>
+                <div class="nav-desc">预算控制</div>
+            </a>
+
+            <a href="account.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-title">账户中心</div>
+                <div class="nav-desc">个人设置</div>
+            </a>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="simulateLogin()">模拟登录</button>
+            <button class="btn btn-secondary" onclick="clearData()">清除数据</button>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const user = CashFlowUtils.getCurrentUser();
+            const loginStatusText = document.getElementById('loginStatusText');
+            const userInfo = document.getElementById('userInfo');
+
+            if (user) {
+                loginStatusText.textContent = '已登录';
+                loginStatusText.style.color = 'var(--income-emerald)';
+                userInfo.textContent = user.displayName;
+            } else {
+                loginStatusText.textContent = '未登录';
+                loginStatusText.style.color = 'var(--expense-rose)';
+                userInfo.textContent = '-';
+            }
+        }
+
+        // 模拟登录
+        function simulateLogin() {
+            const mockUser = {
+                id: Date.now(),
+                username: 'test_user',
+                email: 'test@example.com',
+                displayName: '测试用户',
+                phone: '13800138000'
+            };
+
+            CashFlowUtils.login(mockUser);
+            checkLoginStatus();
+            CashFlowUtils.notification.success('登录成功！');
+        }
+
+        // 清除数据
+        function clearData() {
+            if (confirm('确定要清除所有数据吗？')) {
+                CashFlowUtils.storage.clearAll();
+                localStorage.removeItem('cashflow_user');
+                checkLoginStatus();
+                CashFlowUtils.notification.success('数据已清除');
+            }
+        }
+
+        // 页面加载时检查状态
+        document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    </script>
+</body>
+</html>

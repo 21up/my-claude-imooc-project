@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预算管理 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+    <style>
+        /* 预算管理页面特定样式 */
+        .budget-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .budget-summary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 20px;
+            padding: 24px;
+            color: var(--on-primary);
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .budget-summary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .budget-summary::after {
+            content: '点击添加预算';
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .budget-summary:hover::after {
+            opacity: 1;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .summary-amount {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: var(--font-family-mono);
+        }
+
+        .summary-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .budget-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .budget-category {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .budget-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .budget-info {
+            flex: 1;
+        }
+
+        .budget-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .budget-period {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .budget-amounts {
+            text-align: right;
+        }
+
+        .budget-total {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+            font-family: var(--font-family-mono);
+        }
+
+        .budget-spent {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+            font-family: var(--font-family-mono);
+        }
+
+        .progress-container {
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--surface-container-low);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .progress-percentage {
+            font-weight: 600;
+            font-family: var(--font-family-mono);
+        }
+
+        .budget-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--outline-variant);
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .status-days {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .remaining-days {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--surface-container-low);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .budget-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid var(--outline-variant);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--on-surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--surface-container-low);
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--primary-light);
+        }
+
+        .add-budget-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--surface);
+            border: 2px dashed var(--outline-variant);
+            border-radius: 16px;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .add-budget-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--surface-container-low);
+        }
+
+        .budget-settings {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 16px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-label {
+            font-size: 14px;
+            color: var(--on-surface);
+        }
+
+        .settings-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--outline-variant);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--on-surface-variant);
+        }
+
+        .loading-state .material-symbols-outlined {
+            font-size: 48px;
+            margin-bottom: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface-container-low);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--outline-variant);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            color: var(--on-surface);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="budget-container">
+        <!-- 预算摘要 -->
+        <div class="budget-summary" onclick="showAddBudgetModal()">
+            <div class="summary-header">
+                <div>
+                    <div class="summary-title">本月预算总额</div>
+                    <div class="summary-subtitle">已使用 ¥0.00</div>
+                </div>
+                <div class="summary-amount" id="total-budget">¥0.00</div>
+            </div>
+        </div>
+
+        <!-- 预算列表 -->
+        <div id="budget-list">
+            <div class="loading-state">
+                <span class="material-symbols-outlined spinning">refresh</span>
+                <p>加载中...</p>
+            </div>
+        </div>
+
+        <!-- 预算设置 -->
+        <div class="budget-settings">
+            <h3 class="settings-title">预算设置</h3>
+            <div class="settings-item">
+                <div class="settings-label">预算提醒</div>
+                <div class="settings-control">
+                    <div class="toggle-switch active" onclick="toggleBudgetReminders(this)"></div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-label">超支警告</div>
+                <div class="settings-control">
+                    <div class="toggle-switch active" onclick="toggleBudgetWarnings(this)"></div>
+                </div>
+            </div>
+            <div class="settings-item">
+                <div class="settings-label">月度预算重置</div>
+                <div class="settings-control">
+                    <div class="toggle-switch active" onclick="toggleMonthlyReset(this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加预算模态框 -->
+    <div class="modal" id="add-budget-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加预算</h3>
+                <button class="close-btn" onclick="closeAddBudgetModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="add-budget-form" onsubmit="saveBudget(event)">
+                <div class="form-group">
+                    <label class="form-label">分类</label>
+                    <select class="form-input" id="budget-category" required>
+                        <option value="">请选择分类</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">预算金额</label>
+                    <input type="number" class="form-input" id="budget-amount" placeholder="请输入预算金额" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">预算周期</label>
+                    <select class="form-input" id="budget-period" required>
+                        <option value="month">每月</option>
+                        <option value="week">每周</option>
+                        <option value="year">每年</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">预算名称</label>
+                    <input type="text" class="form-input" id="budget-name" placeholder="例如：7月餐饮预算" required>
+                </div>
+                <button type="submit" class="submit-btn">保存预算</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Budget page loaded');
+
+            // 显示加载状态
+            const budgetList = document.getElementById('budget-list');
+            budgetList.innerHTML = `
+                <div class="loading-state">
+                    <span class="material-symbols-outlined spinning">refresh</span>
+                    <p>加载中...</p>
+                </div>
+            `;
+
+            // 延迟加载，确保页面渲染完成
+            setTimeout(() => {
+                loadBudgets();
+            }, 300);
+        });
+
+        // 加载预算
+        function loadBudgets() {
+            const budgets = CashFlowUtils.storage.getBudgets();
+            const budgetList = document.getElementById('budget-list');
+
+            if (budgets.length === 0) {
+                budgetList.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">account_balance_wallet</span>
+                        <p>暂无预算记录</p>
+                        <p>开始设置您的第一个预算</p>
+                        <button class="action-btn primary" style="margin-top: 16px; max-width: 200px;" onclick="showAddBudgetModal()">
+                            <span class="material-symbols-outlined">add</span>
+                            添加预算
+                        </button>
+                    </div>
+                `;
+                updateBudgetSummary();
+                return;
+            }
+
+            // 获取当前月份的支出
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const transactions = CashFlowUtils.storage.getTransactions();
+            const monthExpenses = transactions.filter(t =>
+                t.type === 'expense' && t.date.slice(0, 7) === currentMonth
+            );
+
+            // 计算每个分类的支出
+            const categoryExpenses = {};
+            monthExpenses.forEach(t => {
+                if (!categoryExpenses[t.category]) {
+                    categoryExpenses[t.category] = 0;
+                }
+                categoryExpenses[t.category] += t.amount;
+            });
+
+            // 渲染预算列表
+            budgetList.innerHTML = budgets.map(budget => {
+                const category = CashFlowUtils.getCategory('expense', budget.category);
+                const spent = categoryExpenses[budget.category] || 0;
+                const percentage = Math.min((spent / budget.amount) * 100, 100);
+                const remaining = budget.amount - spent;
+
+                // 确定进度条颜色
+                let progressColor = category.color;
+                if (percentage > 100) {
+                    progressColor = '#EF4444'; // 红色 - 超支
+                } else if (percentage > 80) {
+                    progressColor = '#F59E0B'; // 橙色 - 接近预算
+                }
+
+                // 确定状态文本
+                let statusText = '正常';
+                let statusClass = '';
+                if (percentage > 100) {
+                    statusText = '已超支';
+                    statusClass = 'over-budget';
+                } else if (percentage > 80) {
+                    statusText = '即将超支';
+                    statusClass = 'warning';
+                }
+
+                return `
+                    <div class="budget-card ${statusClass}">
+                        <div class="budget-header">
+                            <div class="budget-category">
+                                <div class="budget-icon" style="background: ${progressColor}20; color: ${progressColor}">
+                                    <span class="material-symbols-outlined">${category.icon}</span>
+                                </div>
+                                <div class="budget-info">
+                                    <div class="budget-name">${budget.name}</div>
+                                    <div class="budget-period">${getPeriodText(budget.period)}</div>
+                                </div>
+                            </div>
+                            <div class="budget-amounts">
+                                <div class="budget-total">¥${budget.amount.toFixed(2)}</div>
+                                <div class="budget-spent">已用 ¥${spent.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percentage}%; background: ${progressColor}"></div>
+                            </div>
+                            <div class="progress-labels">
+                                <span>已使用 ${percentage.toFixed(1)}%</span>
+                                <span class="progress-percentage">${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="budget-status">
+                            <div class="status-text">
+                                剩余 <span class="remaining-days">
+                                    <span class="material-symbols-outlined">calendar_today</span>
+                                    ${getRemainingDays(budget.period)}
+                                </span>
+                            </div>
+                            <div class="budget-actions">
+                                <button class="action-btn" onclick="editBudget('${budget.id}')">
+                                    <span class="material-symbols-outlined">edit</span>
+                                    编辑
+                                </button>
+                                <button class="action-btn delete" onclick="deleteBudget('${budget.id}')">
+                                    <span class="material-symbols-outlined">delete</span>
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateBudgetSummary();
+        }
+
+        // 更新预算摘要
+        function updateBudgetSummary() {
+            const budgets = CashFlowUtils.storage.getBudgets();
+            const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+
+            document.getElementById('total-budget').textContent = `¥${totalBudget.toFixed(2)}`;
+        }
+
+        // 显示添加预算模态框
+        function showAddBudgetModal() {
+            // 填充分类选项
+            const categorySelect = document.getElementById('budget-category');
+            const expenseCategories = CashFlowUtils.getCategories('expense');
+
+            categorySelect.innerHTML = '<option value="">请选择分类</option>' +
+                expenseCategories.map(cat =>
+                    `<option value="${cat.id}">${cat.name}</option>`
+                ).join('');
+
+            document.getElementById('add-budget-modal').classList.add('show');
+        }
+
+        // 关闭添加预算模态框
+        function closeAddBudgetModal() {
+            document.getElementById('add-budget-modal').classList.remove('show');
+            document.getElementById('add-budget-form').reset();
+        }
+
+        // 保存预算
+        function saveBudget(event) {
+            event.preventDefault();
+
+            const budget = {
+                id: Date.now().toString(),
+                category: document.getElementById('budget-category').value,
+                amount: parseFloat(document.getElementById('budget-amount').value),
+                period: document.getElementById('budget-period').value,
+                name: document.getElementById('budget-name').value,
+                createdAt: new Date().toISOString()
+            };
+
+            CashFlowUtils.storage.saveBudget(budget);
+            closeAddBudgetModal();
+            loadBudgets();
+        }
+
+        // 编辑预算
+        function editBudget(budgetId) {
+            // 这里可以实现编辑预算的功能
+            console.log('Edit budget:', budgetId);
+        }
+
+        // 删除预算
+        function deleteBudget(budgetId) {
+            if (confirm('确定要删除这个预算吗？')) {
+                const budgets = CashFlowUtils.storage.getBudgets();
+                const filteredBudgets = budgets.filter(b => b.id !== budgetId);
+                localStorage.setItem('cashflow_budgets', JSON.stringify(filteredBudgets));
+                loadBudgets();
+            }
+        }
+
+        // 切换预算提醒
+        function toggleBudgetReminders(element) {
+            element.classList.toggle('active');
+        }
+
+        // 切换预算警告
+        function toggleBudgetWarnings(element) {
+            element.classList.toggle('active');
+        }
+
+        // 切换月度重置
+        function toggleMonthlyReset(element) {
+            element.classList.toggle('active');
+        }
+
+        // 获取周期文本
+        function getPeriodText(period) {
+            switch (period) {
+                case 'week': return '每周';
+                case 'month': return '每月';
+                case 'year': return '每年';
+                default: return period;
+            }
+        }
+
+        // 获取剩余天数
+        function getRemainingDays(period) {
+            const now = new Date();
+            let endDate;
+
+            switch (period) {
+                case 'week':
+                    endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'month':
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    break;
+                case 'year':
+                    endDate = new Date(now.getFullYear() + 1, 0, 0);
+                    break;
+            }
+
+            const remaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+            return `${remaining}天`;
+        }
+
+        // 添加示例数据（如果没有数据的话）
+        if (CashFlowUtils.storage.getBudgets().length === 0) {
+            const sampleBudgets = [
+                {
+                    id: Date.now().toString(),
+                    category: 'food',
+                    amount: 2000,
+                    period: 'month',
+                    name: '7月餐饮预算',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: (Date.now() + 1).toString(),
+                    category: 'transport',
+                    amount: 500,
+                    period: 'month',
+                    name: '7月交通预算',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+
+            localStorage.setItem('cashflow_budgets', JSON.stringify(sampleBudgets));
+        }
+    </script>
+</body>
+    <!-- 底部导航栏 -->
+    <nav class="nav-bar" id="bottom-nav">
+        <!-- 导航栏将通过 JavaScript 动态创建 -->
+    </nav>
+
+    <script>
+        // 创建底部导航栏
+        function createBottomNavBar() {
+            const navBar = document.getElementById('bottom-nav');
+            const navItems = [
+                { icon: 'home', label: '首页', page: 'index.html' },
+                { icon: 'receipt_long', label: '流水', page: 'transactions.html' },
+                { icon: 'analytics', label: '分析', page: 'analysis.html' },
+                { icon: 'account_balance_wallet', label: '预算', page: 'budget.html', active: true },
+                { icon: 'account_circle', label: '账户', page: 'account.html' }
+            ];
+
+            const navBarContent = document.createElement('div');
+            navBarContent.className = 'nav-bar-content';
+
+            navItems.forEach(item => {
+                const navItem = document.createElement('a');
+                navItem.href = item.page;
+                navItem.className = `nav-item ${item.active ? 'active' : ''}`;
+                navItem.innerHTML = `
+                    <span class="material-symbols-outlined">${item.icon}</span>
+                    <span>${item.label}</span>
+                `;
+                navBarContent.appendChild(navItem);
+            });
+
+            navBar.appendChild(navBarContent);
+        }
+
+        // 页面加载时初始化导航栏
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建底部导航栏
+            createBottomNavBar();
+
+            // 加载预算数据
+            loadBudgets();
+        });
+    </script>
+</html>

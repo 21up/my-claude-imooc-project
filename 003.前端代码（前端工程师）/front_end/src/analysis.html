@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计分析 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+
+    <!-- 临时工具函数定义 -->
+    <script>
+        // 如果 CashFlowUtils 未定义，创建一个临时版本
+        if (typeof CashFlowUtils === 'undefined') {
+            CashFlowUtils = {
+                storage: {
+                    getTransactions: function() {
+                        return JSON.parse(localStorage.getItem('cashflow_transactions') || '[]');
+                    },
+                    saveTransaction: function(transaction) {
+                        const transactions = this.getTransactions();
+                        transactions.push(transaction);
+                        localStorage.setItem('cashflow_transactions', JSON.stringify(transactions));
+                    }
+                },
+                getCategory: function(type, category) {
+                    const categories = {
+                        income: {
+                            salary: { name: '工资', icon: 'payments', color: '#10B981' },
+                            bonus: { name: '奖金', icon: 'emoji_events', color: '#F59E0B' },
+                            investment: { name: '投资', icon: 'trending_up', color: '#8B5CF6' },
+                            other: { name: '其他', icon: 'more_horiz', color: '#6B7280' }
+                        },
+                        expense: {
+                            food: { name: '餐饮', icon: 'restaurant', color: '#EF4444' },
+                            transport: { name: '交通', icon: 'directions_car', color: '#3B82F6' },
+                            shopping: { name: '购物', icon: 'shopping_bag', color: '#EC4899' },
+                            housing: { name: '住房', icon: 'home', color: '#8B5CF6' },
+                            entertainment: { name: '娱乐', icon: 'sports_esports', color: '#F59E0B' },
+                            healthcare: { name: '医疗', icon: 'medical_services', color: '#10B981' },
+                            education: { name: '教育', icon: 'school', color: '#3B82F6' },
+                            other: { name: '其他', icon: 'more_horiz', color: '#6B7280' }
+                        }
+                    };
+                    return categories[type][category] || categories[type].other;
+                },
+                formatDate: {
+                    toISOString: function(date) {
+                        return date.toISOString().split('T')[0];
+                    },
+                    relative: function(dateString) {
+                        const date = new Date(dateString);
+                        const now = new Date();
+                        const diff = now - date;
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+                        if (days === 0) return '今天';
+                        if (days === 1) return '昨天';
+                        if (days < 7) return `${days}天前`;
+                        if (days < 30) return `${Math.floor(days / 7)}周前`;
+                        return `${Math.floor(days / 30)}个月前`;
+                    }
+                },
+                formatCurrency: {
+                    format: function(amount) {
+                        return '¥' + amount.toFixed(2);
+                    }
+                },
+                statistics: {
+                    monthlyBalance: function(transactions) {
+                        const currentMonth = new Date().getMonth();
+                        const currentYear = new Date().getFullYear();
+
+                        const monthlyTransactions = transactions.filter(t => {
+                            const date = new Date(t.date);
+                            return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                        });
+
+                        const income = monthlyTransactions
+                            .filter(t => t.type === 'income')
+                            .reduce((sum, t) => sum + t.amount, 0);
+
+                        const expense = monthlyTransactions
+                            .filter(t => t.type === 'expense')
+                            .reduce((sum, t) => sum + t.amount, 0);
+
+                        return income - expense;
+                    },
+                    totalIncome: function(transactions) {
+                        return transactions
+                            .filter(t => t.type === 'income')
+                            .reduce((sum, t) => sum + t.amount, 0);
+                    },
+                    totalExpense: function(transactions) {
+                        return transactions
+                            .filter(t => t.type === 'expense')
+                            .reduce((sum, t) => sum + t.amount, 0);
+                    }
+                },
+                notification: {
+                    success: function(message) {
+                        alert(message);
+                    }
+                },
+                exportData: {
+                    toJSON: function() {
+                        const data = {
+                            transactions: CashFlowUtils.storage.getTransactions(),
+                            exportDate: new Date().toISOString(),
+                            version: '1.0'
+                        };
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cashflow_data.json';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+                },
+                getCurrentUser: function() {
+                    return JSON.parse(localStorage.getItem('cashflow_user') || '{}');
+                },
+                logout: function() {
+                    localStorage.removeItem('cashflow_user');
+                    window.location.href = 'login.html';
+                },
+                storage: {
+                    clearAll: function() {
+                        localStorage.removeItem('cashflow_transactions');
+                        localStorage.removeItem('cashflow_user');
+                    }
+                }
+            };
+        }
+    </script>
+    <style>
+        /* 统计分析页面特定样式 */
+        .analysis-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--surface);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .time-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            background: var(--surface-container-low);
+        }
+
+        .time-btn.active {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .add-transaction-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-transaction-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* 响应式处理 */
+        @media (max-width: 768px) {
+            .analysis-container {
+                padding: 16px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .summary-section {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrapper {
+                height: 200px;
+            }
+
+            .category-item {
+                padding: 12px;
+            }
+
+            .insight-item {
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 60, 144, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .summary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-icon.income {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .summary-icon.expense {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .summary-icon.balance {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: var(--font-family-mono);
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .summary-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .trend-up {
+            color: var(--income-emerald);
+        }
+
+        .trend-down {
+            color: var(--expense-rose);
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .category-analysis {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .category-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .category-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+        }
+
+        .category-progress {
+            flex: 1;
+            margin: 0 16px;
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 8px;
+            background: var(--outline-variant);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .category-stats {
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .category-amount {
+            font-family: var(--font-family-mono);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .category-percentage {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .insights-section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .insights-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--on-surface);
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .insight-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .insight-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .insight-icon.success {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .insight-icon.warning {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .insight-icon.info {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .insight-description {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+            line-height: 1.5;
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--on-surface-variant);
+        }
+
+        .loading-state .material-symbols-outlined {
+            font-size: 48px;
+            margin-bottom: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-state p {
+            font-size: 16px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <main class="analysis-container">
+        <!-- 时间选择器 -->
+        <div class="time-selector">
+            <button class="time-btn active" data-period="week">本周</button>
+            <button class="time-btn" data-period="month">本月</button>
+            <button class="time-btn" data-period="year">本年</button>
+        </div>
+
+        <!-- 摘要统计 -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <div class="summary-icon income">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div class="summary-value income" id="total-income">¥0.00</div>
+                <div class="summary-label">总收入</div>
+                <div class="summary-trend trend-up">
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                    <span>较上月 +12.5%</span>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon expense">
+                    <span class="material-symbols-outlined">trending_down</span>
+                </div>
+                <div class="summary-value expense" id="total-expense">¥0.00</div>
+                <div class="summary-label">总支出</div>
+                <div class="summary-trend trend-down">
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                    <span>较上月 -5.2%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 收支趋势图表 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">收支趋势</h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="trend-chart" style="display: none;"></canvas>
+                <div id="chart-placeholder" class="loading-state">
+                    <span class="material-symbols-outlined spinning">refresh</span>
+                    <p>准备图表数据...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类统计 -->
+        <div class="category-analysis">
+            <h3 class="chart-title">支出分类统计</h3>
+            <div class="category-list" id="category-list">
+                <div class="loading-state">
+                    <span class="material-symbols-outlined spinning">refresh</span>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 财务洞察 -->
+        <div class="insights-section">
+            <h3 class="insights-title">财务洞察</h3>
+            <div class="insight-list" id="insight-list">
+                <div class="loading-state">
+                    <span class="material-symbols-outlined">lightbulb</span>
+                    <p>正在分析您的财务状况...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPeriod = 'week';
+        let trendChart = null;
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Analysis page loaded');
+
+            // 初始化时间选择器
+        const timeBtns = document.querySelectorAll('.time-btn');
+        timeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                timeBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentPeriod = this.dataset.period;
+
+                // 重新加载数据
+                initCharts();
+                loadCategoryData();
+                loadInsights();
+            });
+        });
+
+        // 延迟加载，确保页面渲染完成
+            setTimeout(() => {
+                initCharts();
+                loadCategoryData();
+                loadInsights();
+            }, 300);
+        });
+
+        // 初始化图表
+        function initCharts() {
+            const canvas = document.getElementById('trend-chart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Canvas context not available');
+                return;
+            }
+
+            // 检查 chart-placeholder 元素是否存在
+            const placeholder = document.getElementById('chart-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+
+            // 显示图表
+            canvas.style.display = 'block';
+
+            // 生成模拟数据
+            const labels = [];
+            const incomeData = [];
+            const expenseData = [];
+
+            const days = currentPeriod === 'week' ? 7 : currentPeriod === 'month' ? 30 : 12;
+
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+
+                if (currentPeriod === 'week') {
+                    labels.push(date.toLocaleDateString('zh-CN', { weekday: 'short' }));
+                } else if (currentPeriod === 'month') {
+                    labels.push(date.getDate() + '日');
+                } else {
+                    labels.push(date.toLocaleDateString('zh-CN', { month: 'short' }));
+                }
+
+                incomeData.push(Math.floor(Math.random() * 500) + 100);
+                expenseData.push(Math.floor(Math.random() * 300) + 50);
+            }
+
+            if (trendChart) {
+                trendChart.destroy();
+            }
+
+            try {
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                        label: '收入',
+                        data: incomeData,
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '支出',
+                        data: expenseData,
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+                });
+            } catch (error) {
+                console.error('Failed to initialize chart:', error);
+                // 显示错误状态
+                canvas.style.display = 'none';
+                const placeholder = document.getElementById('chart-placeholder');
+                if (placeholder) {
+                    placeholder.innerHTML = `
+                        <span class="material-symbols-outlined">error_outline</span>
+                        <p>图表加载失败</p>
+                    `;
+                }
+            }
+
+            // 更新摘要统计
+            const totalIncome = incomeData.reduce((a, b) => a + b, 0);
+            const totalExpense = expenseData.reduce((a, b) => a + b, 0);
+
+            document.getElementById('total-income').textContent = '¥' + totalIncome.toFixed(2);
+            document.getElementById('total-expense').textContent = '¥' + totalExpense.toFixed(2);
+        }
+
+        // 加载分类数据
+        function loadCategoryData() {
+            const transactions = CashFlowUtils.storage.getTransactions();
+
+            // 如果没有交易数据，显示空状态
+            if (transactions.length === 0) {
+                const categoryList = document.getElementById('category-list');
+                if (categoryList) {
+                    categoryList.innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                            <p>暂无交易数据</p>
+                            <button class="add-transaction-btn" onclick="window.location.href='add-transaction.html'">
+                                <span class="material-symbols-outlined">add</span>
+                                添加第一笔交易
+                            </button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            // 筛选当前周期的支出
+            const filteredTransactions = transactions.filter(t => {
+                if (t.type !== 'expense') return false;
+
+                const transactionDate = new Date(t.date);
+                const now = new Date();
+
+                if (currentPeriod === 'week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return transactionDate >= weekAgo;
+                } else if (currentPeriod === 'month') {
+                    return transactionDate.getMonth() === now.getMonth() &&
+                           transactionDate.getFullYear() === now.getFullYear();
+                } else {
+                    return transactionDate.getFullYear() === now.getFullYear();
+                }
+            });
+
+            // 按分类统计
+            const categoryStats = {};
+            filteredTransactions.forEach(t => {
+                if (!categoryStats[t.category]) {
+                    categoryStats[t.category] = {
+                        amount: 0,
+                        count: 0
+                    };
+                }
+                categoryStats[t.category].amount += t.amount;
+                categoryStats[t.category].count++;
+            });
+
+            // 渲染分类列表
+            const categoryList = document.getElementById('category-list');
+            if (!categoryList) {
+                console.error('Category list element not found');
+                return;
+            }
+
+            const sortedCategories = Object.entries(categoryStats)
+                .sort(([,a], [,b]) => b.amount - a.amount)
+                .slice(0, 5);
+
+            if (sortedCategories.length === 0) {
+                categoryList.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">category</span>
+                        <p>暂无支出数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalExpense = sortedCategories.reduce((sum, [,stat]) => sum + stat.amount, 0);
+
+            categoryList.innerHTML = sortedCategories.map(([category, stat]) => {
+                const categoryInfo = CashFlowUtils.getCategory('expense', category);
+                const percentage = (stat.amount / totalExpense * 100).toFixed(1);
+
+                return `
+                    <div class="category-item">
+                        <div class="category-info">
+                            <div class="category-icon" style="background: ${categoryInfo.color}20; color: ${categoryInfo.color}">
+                                <span class="material-symbols-outlined">${categoryInfo.icon}</span>
+                            </div>
+                            <div class="category-name">${categoryInfo.name}</div>
+                        </div>
+                        <div class="category-progress">
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-fill" style="width: ${percentage}%; background: ${categoryInfo.color}"></div>
+                            </div>
+                            <div class="category-percentage">${percentage}%</div>
+                        </div>
+                        <div class="category-stats">
+                            <div class="category-amount">¥${stat.amount.toFixed(2)}</div>
+                            <div class="category-percentage">${stat.count}笔</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 加载财务洞察
+        function loadInsights() {
+            const transactions = CashFlowUtils.storage.getTransactions();
+            const insights = [];
+
+            // 分析最大支出
+            const expenseTransactions = transactions.filter(t => t.type === 'expense');
+            if (expenseTransactions.length > 0) {
+                const maxExpense = expenseTransactions.reduce((max, t) => t.amount > max.amount ? t : max);
+                const category = CashFlowUtils.getCategory('expense', maxExpense.category);
+
+                insights.push({
+                    type: 'warning',
+                    title: '最大支出提醒',
+                    description: `您在本月${category.name}方面支出最多，金额为¥${maxExpense.amount.toFixed(2)}，建议合理控制该类支出。`
+                });
+            }
+
+            // 分析收入稳定性
+            const incomeTransactions = transactions.filter(t => t.type === 'income');
+            if (incomeTransactions.length > 0) {
+                const avgIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0) / incomeTransactions.length;
+                const incomeVariance = incomeTransactions.reduce((sum, t) => sum + Math.pow(t.amount - avgIncome, 2), 0) / incomeTransactions.length;
+                const incomeStdDev = Math.sqrt(incomeVariance);
+
+                if (incomeStdDev / avgIncome > 0.3) {
+                    insights.push({
+                        type: 'info',
+                        title: '收入波动提醒',
+                        description: '您的收入波动较大，建议建立应急基金，以应对收入不稳定的情况。'
+                    });
+                }
+            }
+
+            // 计算储蓄率
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+            if (totalIncome > 0) {
+                const savingsRate = ((totalIncome - totalExpense) / totalIncome * 100).toFixed(1);
+
+                if (savingsRate > 20) {
+                    insights.push({
+                        type: 'success',
+                        title: '储蓄率优秀',
+                        description: `您的储蓄率达到${savingsRate}%，超过了推荐的20%，继续保持！`
+                    });
+                } else if (savingsRate < 0) {
+                    insights.push({
+                        type: 'warning',
+                        title: '支出超支提醒',
+                        description: `本月支出超过了收入${Math.abs(savingsRate)}%，建议调整消费习惯。`
+                    });
+                }
+            }
+
+            // 渲染洞察列表
+            const insightList = document.getElementById('insight-list');
+            if (!insightList) {
+                console.error('Insight list element not found');
+                return;
+            }
+
+            if (insights.length === 0) {
+                insightList.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">lightbulb</span>
+                        <p>暂无财务洞察</p>
+                    </div>
+                `;
+                return;
+            }
+
+            insightList.innerHTML = insights.map(insight => `
+                <div class="insight-item">
+                    <div class="insight-icon ${insight.type}">
+                        <span class="material-symbols-outlined">
+                            ${insight.type === 'success' ? 'check_circle' :
+                              insight.type === 'warning' ? 'warning' : 'info'}
+                        </span>
+                    </div>
+                    <div class="insight-content">
+                        <div class="insight-title">${insight.title}</div>
+                        <div class="insight-description">${insight.description}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+        // 添加示例数据（如果没有数据的话）
+        if (CashFlowUtils.storage.getTransactions().length === 0) {
+            const sampleTransactions = [
+                {
+                    id: Date.now(),
+                    type: 'income',
+                    amount: 5000,
+                    category: 'salary',
+                    description: '7月工资',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '月度工资'
+                },
+                {
+                    id: Date.now() + 1,
+                    type: 'expense',
+                    amount: 1500,
+                    category: 'housing',
+                    description: '房租',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '7月份房租'
+                },
+                {
+                    id: Date.now() + 2,
+                    type: 'expense',
+                    amount: 200,
+                    category: 'food',
+                    description: '午餐',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 86400000)),
+                    notes: '商务午餐'
+                },
+                {
+                    id: Date.now() + 3,
+                    type: 'expense',
+                    amount: 89,
+                    category: 'transport',
+                    description: '地铁',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 2 * 86400000)),
+                    notes: '通勤'
+                }
+            ];
+
+            sampleTransactions.forEach(transaction => {
+                CashFlowUtils.storage.saveTransaction(transaction);
+            });
+
+            // 重新加载数据
+            setTimeout(() => {
+                initCharts();
+                loadCategoryData();
+                loadInsights();
+            }, 500);
+        }
+    </script>
+</main>
+<!-- 底部导航栏 -->
+<nav class="nav-bar" id="bottom-nav">
+    <!-- 导航栏将通过 JavaScript 动态创建 -->
+</nav>
+
+<script>
+    // 创建底部导航栏
+    function createBottomNavBar() {
+        const navBar = document.getElementById('bottom-nav');
+        const navItems = [
+            { icon: 'home', label: '首页', page: 'index.html' },
+            { icon: 'receipt_long', label: '流水', page: 'transactions.html' },
+            { icon: 'analytics', label: '分析', page: 'analysis.html', active: true },
+            { icon: 'account_balance_wallet', label: '预算', page: 'budget.html' },
+            { icon: 'account_circle', label: '账户', page: 'account.html' }
+        ];
+
+        const navBarContent = document.createElement('div');
+        navBarContent.className = 'nav-bar-content';
+
+        navItems.forEach(item => {
+            const navItem = document.createElement('a');
+            navItem.href = item.page;
+            navItem.className = `nav-item ${item.active ? 'active' : ''}`;
+            navItem.innerHTML = `
+                <span class="material-symbols-outlined">${item.icon}</span>
+                <span>${item.label}</span>
+            `;
+            navBarContent.appendChild(navItem);
+        });
+
+        navBar.appendChild(navBarContent);
+    }
+
+    // 页面加载时初始化导航栏
+    document.addEventListener('DOMContentLoaded', function() {
+        // 创建底部导航栏
+        createBottomNavBar();
+    });
+</script>
+</body>
+</html>

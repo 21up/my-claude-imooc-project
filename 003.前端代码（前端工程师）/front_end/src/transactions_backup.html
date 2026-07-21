@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流水账单 - CashFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+    <style>
+        /* 账单列表页面特定样式 */
+        .transactions-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--outline-variant);
+            border-radius: 20px;
+            background: var(--surface);
+            color: var(--on-surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: var(--on-primary);
+            border-color: var(--primary-color);
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 16px;
+            background: var(--surface);
+            font-size: 16px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--on-surface-variant);
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--surface);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn:hover {
+            background: var(--surface-container-low);
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            color: var(--on-primary);
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-group {
+            margin-bottom: 24px;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .group-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .group-date {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+        }
+
+        .transaction-item {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .transaction-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon {
+            font-size: 24px;
+        }
+
+        .transaction-icon.expense {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .transaction-icon.income {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 4px;
+        }
+
+        .transaction-meta {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            display: flex;
+            gap: 12px;
+        }
+
+        .transaction-category {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .category-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--on-surface-variant);
+        }
+
+        .transaction-date {
+            font-size: 12px;
+        }
+
+        .transaction-amount {
+            font-family: var(--font-family-mono);
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .transaction-amount.expense {
+            color: var(--expense-rose);
+        }
+
+        .transaction-amount.income {
+            color: var(--income-emerald);
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 600;
+            font-family: var(--font-family-mono);
+        }
+
+        .summary-value.income {
+            color: var(--income-emerald);
+        }
+
+        .summary-value.expense {
+            color: var(--expense-rose);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .export-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: var(--on-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 60, 144, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .export-btn .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-title {
+            }
+
+            // 加载交易记录
+            loadTransactions();
+        });
+
+        // 加载交易记录
+        function loadTransactions() {
+            transactions = CashFlowUtils.storage.getTransactions();
+            filterTransactions();
+            renderTransactions();
+            updateSummary();
+        }
+
+        // 筛选交易记录
+        function filterTransactions() {
+            const currentDate = new Date();
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+
+            filteredTransactions = transactions.filter(transaction => {
+                // 时间筛选
+                const transactionDate = new Date(transaction.date);
+
+                switch(currentPeriod) {
+                    case 'today':
+                        return transactionDate.toDateString() === currentDate.toDateString();
+                    case 'week':
+                        const weekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return transactionDate >= weekAgo;
+                    case 'month':
+                        return transactionDate.getMonth() === currentDate.getMonth() &&
+                               transactionDate.getFullYear() === currentDate.getFullYear();
+                    case 'year':
+                        return transactionDate.getFullYear() === currentDate.getFullYear();
+                    case 'all':
+                        return true;
+                    default:
+                        return true;
+                }
+            });
+
+            // 搜索筛选
+            if (searchInput) {
+                filteredTransactions = filteredTransactions.filter(transaction => {
+                    return transaction.description.toLowerCase().includes(searchInput) ||
+                           transaction.category.toLowerCase().includes(searchInput) ||
+                           (transaction.notes && transaction.notes.toLowerCase().includes(searchInput));
+                });
+            }
+
+            // 按日期倒序排列
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        // 渲染交易列表
+        function renderTransactions() {
+            const listContainer = document.getElementById('transaction-list');
+            const emptyState = document.getElementById('empty-state');
+
+            if (filteredTransactions.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // 按日期分组
+            const groupedTransactions = {};
+            filteredTransactions.forEach(transaction => {
+                const date = transaction.date;
+                if (!groupedTransactions[date]) {
+                    groupedTransactions[date] = [];
+                }
+                groupedTransactions[date].push(transaction);
+            });
+
+            // 按日期排序（倒序）
+            const sortedDates = Object.keys(groupedTransactions).sort((a, b) => new Date(b) - new Date(a));
+
+            listContainer.innerHTML = sortedDates.map(date => {
+                const dayTransactions = groupedTransactions[date];
+                const dateStr = CashFlowUtils.formatDate.relative(date);
+                const dayTotalIncome = dayTransactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                const dayTotalExpense = dayTransactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                return `
+                    <div class="transaction-group">
+                        <div class="group-header">
+                            <div>
+                                <div class="group-title">${dateStr}</div>
+                                <div class="group-date">
+                                    收入 +¥${CashFlowUtils.formatCurrency.format(dayTotalIncome)} |
+                                    支出 -¥${CashFlowUtils.formatCurrency.format(dayTotalExpense)}
+                                </div>
+                            </div>
+                        </div>
+                        ${dayTransactions.map(transaction => renderTransactionItem(transaction)).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染单个交易项
+        function renderTransactionItem(transaction) {
+            const category = CashFlowUtils.getCategory(transaction.type, transaction.category);
+            const timeStr = new Date(transaction.date).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = CashFlowUtils.formatDate.relative(transaction.date);
+
+            return `
+                <div class="transaction-item" onclick="showTransactionDetail('${transaction.id}')">
+                    <div class="transaction-info">
+                        <div class="transaction-icon-wrapper ${transaction.type}">
+                            <span class="material-symbols-outlined transaction-icon">${category.icon}</span>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-name">${transaction.description}</div>
+                            <div class="transaction-meta">
+                                <div class="transaction-category">
+                                    <span class="category-dot"></span>
+                                    <span>${category.name}</span>
+                                </div>
+                                <span class="transaction-date">${timeStr}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.type}">
+                        ${transaction.type === 'income' ? '+' : '-'}${CashFlowUtils.formatCurrency.format(transaction.amount)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新汇总
+        function updateSummary() {
+            const totalIncome = filteredTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = filteredTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            document.getElementById('summary-income').textContent = CashFlowUtils.formatCurrency.format(totalIncome);
+            document.getElementById('summary-expense').textContent = CashFlowUtils.formatCurrency.format(totalExpense);
+        }
+
+        // 选择时间段
+        function selectPeriod(period) {
+            currentPeriod = period;
+
+            // 更新按钮状态
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 重新筛选和渲染
+            filterTransactions();
+            renderTransactions();
+            updateSummary();
+        }
+
+        // 搜索交易
+        function searchTransactions() {
+            filterTransactions();
+            renderTransactions();
+            updateSummary();
+        }
+
+        // 显示交易详情
+        function showTransactionDetail(transactionId) {
+            const transaction = transactions.find(t => t.id == transactionId);
+            if (transaction) {
+                // 这里可以打开一个模态框显示详情
+                console.log('交易详情:', transaction);
+
+                // 或者跳转到详情页面
+                // window.location.href = `transaction-detail.html?id=${transactionId}`;
+            }
+        }
+
+        // 显示删除确认
+        function showDeleteModal(transactionId) {
+            transactionToDelete = transactionId;
+            document.getElementById('delete-modal').classList.add('show');
+        }
+
+        // 关闭删除确认
+        function closeDeleteModal() {
+            transactionToDelete = null;
+            document.getElementById('delete-modal').classList.remove('show');
+        }
+
+        // 确认删除
+        function confirmDelete() {
+            if (transactionToDelete) {
+                CashFlowUtils.storage.deleteTransaction(transactionToDelete);
+
+                // 重新加载数据
+                loadTransactions();
+
+                // 关闭模态框
+                closeDeleteModal();
+
+                // 显示成功提示
+                CashFlowUtils.notification.success('交易记录已删除');
+            }
+        }
+
+        // 导出交易记录
+        function exportTransactions() {
+            if (filteredTransactions.length === 0) {
+                CashFlowUtils.notification.warning('没有可导出的交易记录');
+                return;
+            }
+
+            CashFlowUtils.exportData.toCSV(filteredTransactions);
+        }
+
+        // 切换视图
+        function toggleView() {
+            const viewIcon = document.getElementById('view-icon');
+            if (viewIcon.textContent === 'view_list') {
+                viewIcon.textContent = 'view_agenda';
+                // 这里可以实现卡片视图
+            } else {
+                viewIcon.textContent = 'view_list';
+                // 这里可以切换回列表视图
+            }
+        }
+
+        // 显示筛选模态框
+        function showFilterModal() {
+            // 这里可以实现更复杂的筛选功能
+            CashFlowUtils.notification.info('筛选功能开发中');
+        }
+
+        // 添加一些示例数据（仅用于演示）
+        if (CashFlowUtils.storage.getTransactions().length === 0) {
+            // 添加示例数据
+            const sampleTransactions = [
+                {
+                    id: Date.now(),
+                    type: 'income',
+                    amount: 8000,
+                    category: 'salary',
+                    description: '7月工资',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '月度工资'
+                },
+                {
+                    id: Date.now() + 1,
+                    type: 'expense',
+                    amount: 1500,
+                    category: 'housing',
+                    description: '房租',
+                    date: CashFlowUtils.formatDate.toISOString(new Date()),
+                    notes: '7月份房租'
+                },
+                {
+                    id: Date.now() + 2,
+                    type: 'expense',
+                    amount: 200,
+                    category: 'food',
+                    description: '午餐',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 86400000)),
+                    notes: '商务午餐'
+                },
+                {
+                    id: Date.now() + 3,
+                    type: 'expense',
+                    amount: 89,
+                    category: 'transport',
+                    description: '地铁',
+                    date: CashFlowUtils.formatDate.toISOString(new Date(Date.now() - 2 * 86400000)),
+                    notes: '通勤'
+                }
+            ];
+
+            sampleTransactions.forEach(transaction => {
+                CashFlowUtils.storage.saveTransaction(transaction);
+            });
+
+            // 测试脚本是否加载
+            console.log('Transactions page script loaded');
+
+            // 页面加载时初始化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 显示加载状态
+                const listContainer = document.getElementById('transaction-list');
+                listContainer.innerHTML = `
+                    <div class="loading-state">
+                        <span class="material-symbols-outlined spinning">refresh</span>
+                        <p>加载中...</p>
+                    </div>
+                `;
+
+                // 延迟加载，确保页面渲染完成
+                setTimeout(() => {
+                    loadTransactions();
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>

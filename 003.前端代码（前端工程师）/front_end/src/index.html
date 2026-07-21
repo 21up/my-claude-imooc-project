@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow - 个人财务管理</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 主页特定样式 */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 20px;
+            color: var(--on-primary);
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-50px, -50px) rotate(180deg); }
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .quick-action-btn {
+            background: var(--surface);
+            border: 2px solid var(--outline-variant);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--on-surface);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 60, 144, 0.1);
+        }
+
+        .quick-action-btn .material-symbols-outlined {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .quick-action-btn span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .stat-icon.income {
+            background: var(--income-emerald);
+            color: var(--on-income);
+        }
+
+        .stat-icon.expense {
+            background: var(--expense-rose);
+            color: var(--on-expense);
+        }
+
+        .recent-transactions {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .see-all {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .see-all:hover {
+            text-decoration: underline;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--outline-variant);
+            transition: background-color 0.2s ease;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-item:hover {
+            background-color: var(--surface-container-low);
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-weight: 500;
+            color: var(--on-surface);
+            margin-bottom: 2px;
+        }
+
+        .transaction-meta {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        .transaction-amount {
+            font-family: var(--font-family-mono);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .transaction-amount.income {
+            color: var(--income-emerald);
+        }
+
+        .transaction-amount.expense {
+            color: var(--expense-rose);
+        }
+
+        /* 加载动画 */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-container-low) 25%, var(--surface-container) 50%, var(--surface-container-low) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* 响应式 */
+        @media (max-width: 640px) {
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+    <!-- CashFlow 工具函数库 -->
+    <script src="js/utils.js"></script>
+    <script src="js/navbar.js"></script>
+<body>
+
+    <main class="px-margin-mobile pb-20 max-w-md mx-auto">
+        <!-- 余额卡片 -->
+        <div class="balance-card relative">
+            <div class="relative z-10">
+                <p class="text-white/80 mb-2">总余额</p>
+                <h2 class="text-4xl font-bold mb-4" id="total-balance">¥0.00</h2>
+                <div class="flex justify-between text-sm text-white/80">
+                    <div>
+                        <p class="text-white/60">本月收入</p>
+                        <p class="font-semibold" id="month-income">¥0.00</p>
+                    </div>
+                    <div>
+                        <p class="text-white/60">本月支出</p>
+                        <p class="font-semibold" id="month-expense">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速操作 -->
+        <div class="quick-actions">
+            <a href="add-transaction.html" class="quick-action-btn">
+                <span class="material-symbols-outlined">add</span>
+                <span>记账</span>
+            </a>
+            <a href="transactions.html" class="quick-action-btn">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span>流水</span>
+            </a>
+            <a href="analysis.html" class="quick-action-btn">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span>分析</span>
+            </a>
+            <a href="budget.html" class="quick-action-btn">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+                <span>预算</span>
+            </a>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon income">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div class="stat-value" id="income-stat">¥0</div>
+                <div class="stat-label">累计收入</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon expense">
+                    <span class="material-symbols-outlined">trending_down</span>
+                </div>
+                <div class="stat-value" id="expense-stat">¥0</div>
+                <div class="stat-label">累计支出</div>
+            </div>
+        </div>
+
+        <!-- 最近交易 -->
+        <div class="recent-transactions">
+            <div class="section-header">
+                <h3 class="section-title">最近交易</h3>
+                <a href="transactions.html" class="see-all">查看全部</a>
+            </div>
+            <div class="transaction-list" id="recent-transactions">
+                <!-- 交易项将通过 JavaScript 动态加载 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航栏 -->
+    <nav class="nav-bar" id="bottom-nav">
+        <!-- 导航栏将通过 JavaScript 动态创建 -->
+    </nav>
+
+    <script>
+        // 创建底部导航栏
+        function createBottomNavBar() {
+            const navBar = document.getElementById('bottom-nav');
+            const navItems = [
+                { icon: 'home', label: '首页', page: 'index.html', active: true },
+                { icon: 'receipt_long', label: '流水', page: 'transactions.html' },
+                { icon: 'analytics', label: '分析', page: 'analysis.html' },
+                { icon: 'account_balance_wallet', label: '预算', page: 'budget.html' },
+                { icon: 'account_circle', label: '账户', page: 'account.html' }
+            ];
+
+            const navBarContent = document.createElement('div');
+            navBarContent.className = 'nav-bar-content';
+
+            navItems.forEach(item => {
+                const navItem = document.createElement('a');
+                navItem.href = item.page;
+                navItem.className = `nav-item ${item.active ? 'active' : ''}`;
+                navItem.innerHTML = `
+                    <span class="material-symbols-outlined">${item.icon}</span>
+                    <span>${item.label}</span>
+                `;
+                navBarContent.appendChild(navItem);
+            });
+
+            navBar.appendChild(navBarContent);
+        }
+
+        // 页面加载时检查是否已登录
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建底部导航栏
+            createBottomNavBar();
+
+            // 页面加载时检查是否已登录
+            setTimeout(() => {
+                const user = CashFlowUtils.getCurrentUser();
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // 加载用户数据
+                const transactions = CashFlowUtils.storage.getTransactions();
+
+                // 计算余额
+                const totalBalance = CashFlowUtils.statistics.monthlyBalance(transactions);
+                const monthIncome = CashFlowUtils.statistics.totalIncome(transactions);
+                const monthExpense = CashFlowUtils.statistics.totalExpense(transactions);
+
+                // 更新显示
+                document.getElementById('total-balance').textContent = CashFlowUtils.formatCurrency.format(totalBalance);
+                document.getElementById('month-income').textContent = CashFlowUtils.formatCurrency.format(monthIncome);
+                document.getElementById('month-expense').textContent = CashFlowUtils.formatCurrency.format(monthExpense);
+
+                // 加载最近交易
+                const recentTransactions = transactions.slice(0, 5);
+                const recentTransactionsContainer = document.getElementById('recent-transactions');
+
+                if (recentTransactions.length === 0) {
+                    recentTransactionsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                            <p>暂无交易记录</p>
+                        </div>
+                    `;
+                } else {
+                    recentTransactionsContainer.innerHTML = recentTransactions.map(transaction => {
+                        const category = CashFlowUtils.getCategory(transaction.type, transaction.category);
+                        const isIncome = transaction.type === 'income';
+                        const amountClass = isIncome ? 'income' : 'expense';
+                        const amountPrefix = isIncome ? '+' : '-';
+
+                        return `
+                            <div class="transaction-item">
+                                <div class="transaction-info">
+                                    <div class="transaction-icon ${transaction.type}">
+                                        <span class="material-symbols-outlined">${category.icon}</span>
+                                    </div>
+                                    <div class="transaction-details">
+                                        <div class="transaction-name">${category.name}</div>
+                                        <div class="transaction-meta">${CashFlowUtils.formatDate.relative(transaction.date)}</div>
+                                    </div>
+                                </div>
+                                <div class="transaction-amount ${amountClass}">
+                                    ${amountPrefix}${CashFlowUtils.formatCurrency.format(transaction.amount)}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }, 200);
+        });
+    </script>

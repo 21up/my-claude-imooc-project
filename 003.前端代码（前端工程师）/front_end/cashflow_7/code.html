@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#002113",
+                    "on-background": "#0b1c30",
+                    "surface-dark": "#0F172A",
+                    "background-light": "#F8FAFC",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#0f52ba",
+                    "on-primary-fixed": "#001945",
+                    "tertiary": "#870011",
+                    "inverse-primary": "#b0c6ff",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-primary-fixed-variant": "#00419c",
+                    "outline": "#737784",
+                    "on-surface-variant": "#434653",
+                    "surface-dim": "#cbdbf5",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#ffbfba",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-container": "#00714d",
+                    "secondary": "#006c49",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-tint": "#1d59c1",
+                    "primary": "#003c90",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "primary-fixed": "#d9e2ff",
+                    "income-emerald": "#10B981",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-tertiary-fixed": "#410004",
+                    "primary-fixed-dim": "#b0c6ff",
+                    "surface-variant": "#d3e4fe",
+                    "expense-rose": "#EF4444",
+                    "tertiary-container": "#b0111e",
+                    "on-surface": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdad7",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-fixed-variant": "#005236",
+                    "surface-container": "#e5eeff",
+                    "on-primary-container": "#bcceff",
+                    "accent-blue": "#3B82F6",
+                    "outline-variant": "#c3c6d5",
+                    "background": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#6cf8bb",
+                    "inverse-surface": "#213145",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "margin-desktop": "48px",
+                    "container-max-width": "1280px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "title-md": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script></head><body class="flex flex-col min-h-screen">
+
+    <!-- Login Shell Container -->
+    <main class="flex-grow flex flex-col items-center justify-center px-margin-mobile relative">
+        
+        <!-- Background Subtle Pattern (Pure CSS) -->
+        <div class="absolute inset-0 z-[-1] opacity-20 pointer-events-none" style="background-image: radial-gradient(#d3e4fe 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+        <!-- Brand Header Section -->
+        <header class="text-center mb-10 w-full max-w-sm">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary-container text-white mb-6 shadow-lg">
+                <span class="material-symbols-outlined text-4xl" style="font-variation-settings: &quot;FILL&quot; 1;" data-original-icon="account_balance_wallet">circle</span>
+            </div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">CashFlow</h1>
+            <p class="font-body-sm text-on-surface-variant mt-2">您的安全个人财务助手</p>
+        </header>
+
+        <!-- Login Form Card -->
+        <div class="w-full max-w-sm bg-surface-container-lowest rounded-xl p-6 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]">
+            <form class="space-y-5" onsubmit="return false;">
+                
+                <!-- Username Field -->
+                <div class="space-y-1.5">
+                    <label for="username" class="font-body-sm font-semibold text-on-surface">用户名 / 邮箱</label>
+                    <div class="relative flex items-center border border-outline-variant rounded-lg bg-white transition-all duration-200 focused-input">
+                        <span class="material-symbols-outlined ml-3 text-outline text-xl">person</span>
+                        <input type="text" id="username" placeholder="请输入您的账户" class="w-full bg-transparent py-3 pl-2 pr-4 text-body-lg border-none focus:ring-0 outline-none">
+                    </div>
+                </div>
+
+                <!---->
+                <div class="space-y-1.5">
+                    <label for="password" class="font-body-sm font-semibold text-on-surface">密码</label>
+                    <div class="relative flex items-center border border-outline-variant rounded-lg bg-white transition-all duration-200 focused-input">
+                        <span class="material-symbols-outlined ml-3 text-outline text-xl">lock</span>
+                        <input type="password" id="password" placeholder="请输入密码" class="w-full bg-transparent py-3 pl-2 pr-12 text-body-lg border-none focus:ring-0 outline-none">
+                        <button type="button" class="absolute right-3 text-outline hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center cursor-pointer group">
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only peer">
+                            <div class="w-5 h-5 border border-outline-variant rounded bg-white peer-checked:bg-primary peer-checked:border-primary transition-all"></div>
+                            <span class="material-symbols-outlined absolute inset-0 text-white text-[16px] flex items-center justify-center opacity-0 peer-checked:opacity-100">check</span>
+                        </div>
+                        <span class="font-body-sm text-on-surface-variant ml-2 group-hover:text-primary transition-colors">保持登录30天</span>
+                    </label>
+                    
+                </div>
+
+                <!-- Primary Login Button -->
+                <button type="submit" class="w-full py-4 bg-primary text-white rounded-lg font-title-md hover:bg-on-primary-fixed-variant active:scale-[0.98] transition-all shadow-md">
+                    登录
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="flex items-center my-6">
+                <div class="flex-grow h-[1px] bg-outline-variant"></div>
+                <span class="px-4 font-label-caps text-outline">或通过</span>
+                <div class="flex-grow h-[1px] bg-outline-variant"></div>
+            </div>
+
+            <!-- Social/Alternative Logins (Biometrics Focus) -->
+            
+
+            <!-- Signup Redirect -->
+            <div class="text-center">
+                <p class="font-body-sm text-on-surface-variant">
+                    还没有账户? <a href="#" class="text-primary font-semibold hover:underline">立即注册</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Security Trust Markers -->
+        <footer class="mt-12 w-full max-w-sm">
+            <div class="flex flex-wrap items-center justify-center gap-6 opacity-60">
+                <div class="flex items-center gap-1.5 grayscale">
+                    <span class="material-symbols-outlined text-xl" data-original-icon="verified_user">circle</span>
+                    <span class="font-label-caps uppercase">256-bit SSL</span>
+                </div>
+                <div class="flex items-center gap-1.5 grayscale">
+                    <span class="material-symbols-outlined text-xl">security</span>
+                    <span class="font-label-caps uppercase">银行级安全</span>
+                </div>
+                <div class="flex items-center gap-1.5 grayscale">
+                    <span class="material-symbols-outlined text-xl">shield</span>
+                    <span class="font-label-caps uppercase">隐私加密</span>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <p class="font-label-caps text-outline text-[10px]">© 2024 CashFlow 金融技术有限公司. 沪ICP备00000000号</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Micro-interaction Script -->
+    <script class="">
+        document.addEventListener('DOMContentLoaded', () => {
+            const passInput = document.getElementById('password');
+            const toggleBtn = passInput.nextElementSibling;
+            
+            toggleBtn.addEventListener('click', () => {
+                const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passInput.setAttribute('type', type);
+                toggleBtn.querySelector('span').textContent = type === 'password' ? 'visibility' : 'visibility_off';
+            });
+
+            // Gentle interaction for inputs
+            const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+            inputs.forEach(input</script></body></html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html><html class="light" lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>账户中心 - CashFlow</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#737784",
+                        "on-primary-fixed": "#001945",
+                        "surface-tint": "#1d59c1",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "primary": "#003c90",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#002113",
+                        "expense-rose": "#EF4444",
+                        "surface-dark": "#0F172A",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "tertiary-container": "#b0111e",
+                        "on-tertiary-container": "#ffbfba",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#410004",
+                        "inverse-surface": "#213145",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container-lowest": "#ffffff",
+                        "income-emerald": "#10B981",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-highest": "#d3e4fe",
+                        "accent-blue": "#3B82F6",
+                        "tertiary": "#870011",
+                        "on-secondary-container": "#00714d",
+                        "inverse-primary": "#b0c6ff",
+                        "secondary-fixed-dim": "#4edea3",
+                        "background": "#f8f9ff",
+                        "primary-container": "#0f52ba",
+                        "outline-variant": "#c3c6d5",
+                        "on-surface-variant": "#434653",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "secondary": "#006c49",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#bcceff",
+                        "secondary-container": "#6cf8bb",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-high": "#dce9ff",
+                        "background-light": "#F8FAFC"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "container-max-width": "1280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "title-md": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9ff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .settings-card {
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="font-body-lg text-on-surface antialiased">
+<!-- Top AppBar -->
+<header class="w-full top-0 sticky z-50 flex items-center justify-between px-margin-mobile py-4 bg-surface dark:bg-surface-dark shadow-sm dark:shadow-none">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of a young Asian professional in a minimalist white-walled studio. The lighting is soft and even, highlighting a clean, sophisticated look with a slight smile. The aesthetic is modern corporate minimalism, utilizing high-key lighting and a pristine background to convey trust and reliability for a financial application user profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNCOrHRV0XiYyaM8mPUU5RK8OBba1RQ2OAf_RQzQ1tWJGQo9hMwM778hwvW75PvI-41TKIxNi-XlQ6EG8QtMAQAny24alCZaM-Yr0x_RBop7cdTmbnxf9tc7uc2LQgbtedBWBs_gjRlv96BlQUCHCsCKyXPfE7RjxYzSzP46G978BdjX7nMq3p7CjDUaLyBzh1YnHWivdOQF92uyf2haN2urZNWGXpKdkS6rgFEXFzF7LRQChbOII5_Q">
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">账户中心</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<main class="px-margin-mobile py-6 mb-24 max-w-md mx-auto">
+<!-- Profile Header Section -->
+<section class="mb-8 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A detailed studio headshot of a person with a friendly and composed expression, representing a high-net-worth individual. The image features soft, directional lighting against a neutral grey background, embodying a corporate minimalism style. The colors are muted and professional, focusing on clarity and personal connection for a premium financial dashboard identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOj3Np4a1kAGxzMJZUV6bsYg6GHjH8K8SlQ9m2oYRHgKbSlmsqDdkMDPM4dhzHu_6us1iQVb-rujQd38RrNSfVx8zzBlvvOZxqRG3pHSZwU_5cDIVHIXBwZN0try0Il_IqtFFPX0-wk-kl3CYqtkdsv-C8J9-RO9gPE8OH6XhSSdVYwKiJq18jJaqBKDKgXc68zq7FZB_NJpGZzItsGCawitpzn_IHqj37TJdxtMwgwsOrzdAJAcGT_A">
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">张明远</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">mingyuan.zhang@email.com</p>
+<div class="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-caps font-label-caps">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                高级会员
+            </div>
+</section>
+<!-- General Settings Group -->
+<div class="space-y-6">
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-3 px-1 uppercase tracking-widest">基本设置</h3>
+<div class="bg-surface rounded-xl overflow-hidden settings-card border border-surface-container">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="font-title-md text-title-md">个人资料</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<div class="h-[1px] bg-outline-variant/30 mx-4"></div>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<span class="font-title-md text-title-md">修改密码</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Security Group -->
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-3 px-1 uppercase tracking-widest">账户安全</h3>
+<div class="bg-surface rounded-xl overflow-hidden settings-card border border-surface-container">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-income-emerald/10 text-income-emerald flex items-center justify-center">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<span class="font-title-md text-title-md">账号安全中心</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<div class="h-[1px] bg-outline-variant/30 mx-4"></div>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-income-emerald/10 text-income-emerald flex items-center justify-center">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div class="text-left">
+<span class="font-title-md text-title-md block">登录历史</span>
+<span class="text-label-caps font-label-caps text-outline">上次登录: 2小时前</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Data Management -->
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-3 px-1 uppercase tracking-widest">数据管理</h3>
+<div class="bg-surface rounded-xl overflow-hidden settings-card border border-surface-container">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-accent-blue/10 text-accent-blue flex items-center justify-center">
+<span class="material-symbols-outlined">download</span>
+</div>
+<div class="text-left">
+<span class="font-title-md text-title-md block">数据导出</span>
+<span class="text-label-caps font-label-caps text-outline">支持 CSV, JSON 格式</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Support & Critical Actions -->
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-3 px-1 uppercase tracking-widest">支持与反馈</h3>
+<div class="bg-surface rounded-xl overflow-hidden settings-card border border-surface-container">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-on-surface-variant/10 text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">help</span>
+</div>
+<span class="font-title-md text-title-md">帮助与反馈</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="pt-4 space-y-3">
+<button class="w-full py-4 px-6 rounded-xl bg-surface border border-outline-variant flex items-center justify-center gap-2 font-title-md text-on-surface active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined text-expense-rose">exit_to_app</span>
+                    安全退出
+                </button>
+<button class="w-full py-4 px-6 rounded-xl bg-error-container/20 border border-error-container flex items-center justify-center gap-2 font-title-md text-expense-rose active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined">person_remove</span>
+                    注销账号
+                </button>
+</div>
+<div class="text-center py-6">
+<p class="text-label-caps font-label-caps text-outline">CashFlow v2.4.0 (2024)</p>
+<p class="text-label-caps font-label-caps text-outline/60 mt-1">Made with security and precision</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-6 bg-surface dark:bg-surface-dark shadow-[0px_-4px_12px_rgba(0,0,0,0.05)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps mt-1">首页</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label-caps text-label-caps mt-1">流水</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-2 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-caps text-label-caps mt-1">分析</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-lg px-4 py-2 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-caps text-label-caps mt-1">账户</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for list items
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.opacity = '0.7';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.opacity = '1';
+            });
+            button.addEventListener('mouseleave', () => {
+                button.style.opacity = '1';
+            });
+        });
+
+        // Prevention of accidental account deletion
+        const deleteBtn = document.querySelector('.bg-error-container\\/20');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                if(!confirm('确定要注销您的账户吗？此操作不可逆。')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    </script>
+</body></html>
